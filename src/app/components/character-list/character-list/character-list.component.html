@@ -1,0 +1,30 @@
+<div class="pagination">
+  <button
+    (click)="previewPage()"
+    [disabled]="currentPage === 1 || loadingInformation"
+  >Anterior</button>
+
+  <span>Página {{currentPage}} de {{totalPages}}</span>
+
+  <button
+    (click)="nextPage()"
+    [disabled]="currentPage=== totalPages || loadingInformation"
+  >Siguiente</button>
+</div>
+
+<button
+  (click)="getAllCharacters()"
+  [disabled]="loadingInformation"
+>Cargar todos los personajes</button>
+<div class="character-grid">
+
+  <div *ngFor="let char of listCharacters | async">
+    <img
+      [src]="char.image"
+      [alt]="char.name"
+      width="50"
+    >
+    <h3>{{char.name}}</h3>
+  </div>
+
+</div>
