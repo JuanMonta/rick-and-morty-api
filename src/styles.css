@@ -1,1 +1,15 @@
-/* You can add global styles to this file, and also import other style files */
+/* Quitar los márgenes por defecto del navegador */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Le decimos a TODOS los elementos (*) que incluyan el padding y los bordes dentro de su tamaño total,
+evitando que los contenedores crezcan sin control. */
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}

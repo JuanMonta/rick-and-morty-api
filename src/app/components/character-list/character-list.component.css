@@ -1,0 +1,43 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  /* Ocupa el alto de su padre colocado en <section class="column-left">
+      <app-character-list></app-character-list>
+    </section>, por ejemplo si tiene el padre un 60%, aquí el 100% será pues ese 60%*/
+  height: 100%;
+  gap: 10px;
+}
+
+.contenedor-tabla {
+  /* Hace que la tabla ocupe todo el espacio sobrante entre mis inputs de busqueda/filtro y la paginación */
+  flex: 1;
+  /* Le dice a Flexbox que permita encoger el div y que use el scroll */
+  min-height: 0;
+  /* Activa la barra de desplazamiento solo aquí en mi componente par la tabla*/
+  overflow-y: auto;
+  border: 1px solid #ccc;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Hacer fijos los encabezados de la tabla */
+th {
+  position: sticky;
+  top: 0;
+  /* Poner un color fijo para que los ancabezados no sean transparentes
+   y evitar que las celdas se vean atras de ellos */
+  background-color: white;
+  /* Lo mantiene por encima de los datos al hacer scroll */
+  z-index: 2;
+  padding: 8px;
+  text-align: left;
+  border-bottom: 2px solid #000;
+}
+
+td {
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+}
