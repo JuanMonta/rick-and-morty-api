@@ -28,14 +28,14 @@ export class CharacterListComponent implements OnInit {
   ngOnInit(): void {
     //this.getAllCharacters();
     //this.getSingleCharacter(1);
-    //this.getCharactersByPage(this.currentPage);
+    this.getCharactersByPage(this.currentPage);
     const characterUrls = [
       "https://rickandmortyapi.com/api/character/1",
       "https://rickandmortyapi.com/api/character/2",
       "https://rickandmortyapi.com/api/character/3",
       "https://rickandmortyapi.com/api/character/4"
     ]
-    this.getMultipleCharactersByUrls(characterUrls);
+    //this.getMultipleCharactersByUrls(characterUrls);
   }
 
   getAllCharacters() {
