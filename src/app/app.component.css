@@ -8,12 +8,12 @@
 }
 
 .contenedor-top {
-  height: 5vh;
+  height: 10vh;
   background-color: #f1f1f1;
 }
 
 .contenedor-central {
-  height: 85vh;
+  height: 80vh;
   display: flex;
   padding: 10px;
   gap: 20px;

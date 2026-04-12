@@ -1,10 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl } from '@angular/forms';
 import { BehaviorSubject, Subject, combineLatest, of, pipe } from 'rxjs';
 import { takeUntil, debounceTime, distinctUntilChanged, startWith, switchMap, catchError, tap } from 'rxjs/operators';
 import { CharacterModel } from 'src/app/models/character-model';
 import { CharacterPaginationModel } from 'src/app/models/character-pagination-model';
 import { PaginationModel } from 'src/app/models/pagination-info-model';
+import { CharacterFavoriteStateService } from 'src/app/services/character-favorite-state.service';
 import { CharacterService } from 'src/app/services/character.service';
 
 @Component({
@@ -28,7 +29,10 @@ export class CharacterListComponent implements OnInit {
   private readonly localFavoriteCharacterTag = 'favoriteCharacter';
   favoriteCharacter!: CharacterModel | null;
 
-  constructor(private readonly _characterService: CharacterService) { }
+  constructor(
+    private readonly _characterService: CharacterService,
+    private readonly _characterFovoriteStateService: CharacterFavoriteStateService
+  ) { }
 
   ngOnInit(): void {
     //this.getAllCharacters();
@@ -232,7 +236,9 @@ export class CharacterListComponent implements OnInit {
     const fav = localStorage.getItem(this.localFavoriteCharacterTag);
     if (fav) {
       this.favoriteCharacter = JSON.parse(fav) as CharacterModel;
+      this._characterFovoriteStateService.setToggleFavoriteCharacter(this.favoriteCharacter);
     } else {
+      this._characterFovoriteStateService.setToggleFavoriteCharacter(null);
       console.log('No existe personaje favorito aún.');
     }
   }
@@ -250,11 +256,13 @@ export class CharacterListComponent implements OnInit {
       //si son iguales quitamos de favoritos
       this.favoriteCharacter = null;
       localStorage.removeItem(this.localFavoriteCharacterTag);
+      this._characterFovoriteStateService.setToggleFavoriteCharacter(this.favoriteCharacter);
     } else {
       // actulizamos en nuevo personaje favorito, al pasarle el modelo de personaje,
       // se actualizará en la tabla automáticamente.
       this.favoriteCharacter = characterModel;
       localStorage.setItem(this.localFavoriteCharacterTag, JSON.stringify(this.favoriteCharacter));
+      this._characterFovoriteStateService.setToggleFavoriteCharacter(this.favoriteCharacter);
     }
   }
 

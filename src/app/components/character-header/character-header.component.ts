@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { CharacterFavoriteStateService } from 'src/app/services/character-favorite-state.service';
 
 @Component({
   selector: 'app-character-header',
@@ -7,9 +8,15 @@ import { Component, OnInit } from '@angular/core';
 })
 export class CharacterHeaderComponent implements OnInit {
 
-  constructor() { }
+  constructor(readonly _characterFavoriteStateService: CharacterFavoriteStateService) { }
+
+  showCharacterExtraInfo : boolean = false;
 
   ngOnInit(): void {
+  }
+
+  toggleCharacterextraInfo(){
+    this.showCharacterExtraInfo = !this.showCharacterExtraInfo;
   }
 
 }
