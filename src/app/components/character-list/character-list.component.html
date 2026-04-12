@@ -57,6 +57,7 @@
   <table>
     <thead>
       <tr>
+        <th></th>
         <th>NAME</th>
         <th>STATUS</th>
         <th>SPECIES</th>
@@ -67,6 +68,11 @@
     </thead>
     <tbody>
       <tr *ngFor="let char of listCharacters | async">
+        <td (click)="toggleFavoriteCharacter(char)">
+          <span
+            [ngStyle]="verificarFavoriteCharacter(char.id) ? {'opacity': '1', 'color': '#f19a0d', 'cursor': 'pointer'} : {'opacity': '0.2', 'color': 'gray', 'cursor': 'pointer'}"
+          >★</span>
+        </td>
         <td>{{char.name}}</td>
         <td>{{char.status}}</td>
         <td>{{char.species}}</td>

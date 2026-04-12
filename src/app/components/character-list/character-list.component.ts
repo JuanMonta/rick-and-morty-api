@@ -25,6 +25,8 @@ export class CharacterListComponent implements OnInit {
   searchByName = new FormControl('');
   searchByStatus = new FormControl('');
 
+  private readonly localFavoriteCharacterTag = 'favoriteCharacter';
+  favoriteCharacter!: CharacterModel | null;
 
   constructor(private readonly _characterService: CharacterService) { }
 
@@ -39,6 +41,7 @@ export class CharacterListComponent implements OnInit {
       "https://rickandmortyapi.com/api/character/4"
     ]
     //this.getMultipleCharactersByUrls(characterUrls);
+    this.getLocalFavoriteCharacter();
     this.filtros();
   }
 
@@ -156,7 +159,7 @@ export class CharacterListComponent implements OnInit {
       )
       .subscribe({
         next: (res) => {
-          console.log('Personajes filtrados: ', res.results)
+          //console.log('Personajes filtrados: ', res.results)
           this.manageSuccess(this.currentPage, res);
 
         },
@@ -169,6 +172,9 @@ export class CharacterListComponent implements OnInit {
 
   private getCharactersByFilters(pageNumber: number, characterName: string, characterStatus: string) {
     return this._characterService.getCharactersByFilters(pageNumber, characterName, characterStatus).pipe(
+      // Aqui si nos devuelve un error la api con un modelo no específico,
+      // hacemos que devuelva un modelo que si conocemos pero vacío para evitar errores,
+      // aquí sé que mi observable devuelte con tipo CharacterPaginationModel
       catchError((error) => {
         console.error('No se encontraron personajes con filtros', error);
         const paginationModel: PaginationModel = {
@@ -182,7 +188,8 @@ export class CharacterListComponent implements OnInit {
           info: paginationModel,
           results: []
         }
-
+        // of(..) convierte mi modelo en un Observable del modelo,
+        // dado que tenemos que devolver un Observable sí o sí
         return of(characterPaginationModel);
       })
     );
@@ -219,6 +226,38 @@ export class CharacterListComponent implements OnInit {
     console.error(mesage, data);
     this.loadingInformation = false;
   }
+
+
+  private getLocalFavoriteCharacter() {
+    const fav = localStorage.getItem(this.localFavoriteCharacterTag);
+    if (fav) {
+      this.favoriteCharacter = JSON.parse(fav) as CharacterModel;
+    } else {
+      console.log('No existe personaje favorito aún.');
+    }
+  }
+
+  verificarFavoriteCharacter(characterId: number) {
+    if (this.favoriteCharacter) {
+      return this.favoriteCharacter.id === characterId;
+    } else {
+      return false;
+    }
+  }
+
+  toggleFavoriteCharacter(characterModel: CharacterModel) {
+    if (this.favoriteCharacter && this.favoriteCharacter.id === characterModel.id) {
+      //si son iguales quitamos de favoritos
+      this.favoriteCharacter = null;
+      localStorage.removeItem(this.localFavoriteCharacterTag);
+    } else {
+      // actulizamos en nuevo personaje favorito, al pasarle el modelo de personaje,
+      // se actualizará en la tabla automáticamente.
+      this.favoriteCharacter = characterModel;
+      localStorage.setItem(this.localFavoriteCharacterTag, JSON.stringify(this.favoriteCharacter));
+    }
+  }
+
 
   ngOnDestroy() {
     this.destroySuscription.next();// Cortar todas las suscripciones al instante
