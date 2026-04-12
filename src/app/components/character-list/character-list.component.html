@@ -32,12 +32,20 @@
  -->
 
 <div>
+
   <input
     type="text"
-    placeholder="Buscar por nombre..."
+    placeholder="Search by name..."
+    [formControl]="searchByName"
   >
+  <button
+    (click)="searchByName.setValue('')"
+    *ngIf="searchByName.value"
+  >X</button>
 
-  <select>
+
+  <label> Status Filter </label>
+  <select [formControl]="searchByStatus">
     <option value="">Default</option>
     <option value="alive">Alive</option>
     <option value="dead">Dead</option>
@@ -76,7 +84,7 @@
     [disabled]="currentPage === 1 || loadingInformation"
   >Anterior</button>
 
-  <span>  Página {{currentPage}} de {{totalPages}}  </span>
+  <span> Página {{currentPage}} de {{totalPages}} </span>
 
   <button
     (click)="nextPage()"

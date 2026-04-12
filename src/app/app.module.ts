@@ -8,6 +8,7 @@ import { CharacterHeaderComponent } from './components/character-header/characte
 import { CharacterFooterComponent } from './components/character-footer/character-footer.component';
 import { CharacterDetailsComponent } from './components/character-details/character-details.component';
 import { DatePipe } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { DatePipe } from '@angular/common';
   ],
   imports: [
     BrowserModule,
-    HttpClientModule
+    HttpClientModule,
+    ReactiveFormsModule
   ],
   providers: [DatePipe],
   bootstrap: [AppComponent]

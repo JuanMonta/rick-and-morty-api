@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { BehaviorSubject, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { FormControl, FormGroup } from '@angular/forms';
+import { BehaviorSubject, Subject, combineLatest, of, pipe } from 'rxjs';
+import { takeUntil, debounceTime, distinctUntilChanged, startWith, switchMap, catchError, tap } from 'rxjs/operators';
 import { CharacterModel } from 'src/app/models/character-model';
 import { CharacterPaginationModel } from 'src/app/models/character-pagination-model';
 import { PaginationModel } from 'src/app/models/pagination-info-model';
@@ -21,14 +22,16 @@ export class CharacterListComponent implements OnInit {
   loadingInformation = false;
   private destroySuscription = new Subject<void>();
 
+  searchByName = new FormControl('');
+  searchByStatus = new FormControl('');
 
 
-  constructor(private _characterService: CharacterService) { }
+  constructor(private readonly _characterService: CharacterService) { }
 
   ngOnInit(): void {
     //this.getAllCharacters();
     //this.getSingleCharacter(1);
-    this.getCharactersByPage(this.currentPage);
+    //this.getCharactersByPage(this.currentPage);
     const characterUrls = [
       "https://rickandmortyapi.com/api/character/1",
       "https://rickandmortyapi.com/api/character/2",
@@ -36,6 +39,7 @@ export class CharacterListComponent implements OnInit {
       "https://rickandmortyapi.com/api/character/4"
     ]
     //this.getMultipleCharactersByUrls(characterUrls);
+    this.filtros();
   }
 
   getAllCharacters() {
@@ -51,8 +55,7 @@ export class CharacterListComponent implements OnInit {
           this.loadingInformation = false;
         },
         error: (err) => {
-          console.log('Ocurrió un error al momento de consultar todos los personajes.', err);
-          this.loadingInformation = false;
+          this.manageErrors('Ocurrió un error al momento de consultar todos los personajes.', err);
         }
       }
       );
@@ -60,62 +63,162 @@ export class CharacterListComponent implements OnInit {
 
   getSingleCharacter(id: number) {
     this.loadingInformation = true;
-    this._characterService.getSingleCharacter(id).subscribe({
-      next: (res) => {
-        const character: CharacterModel[] = [res];
-        //console.log(`Personaje por id: ${JSON.stringify(character, null, '\t')}`);
-        this.listCharacters.next(character)
-        this.loadingInformation = false;
-      },
-      error: (err) => {
-        console.error('Error al cargar el personaje por id.');
-        this.loadingInformation = false;
-      }
-    });
-  }
-
-  getMultipleCharactersByUrls(charUrsl: string[]) {
-    this._characterService.getMultipleCharactersByUrls(charUrsl).subscribe({
-      next: (res) => {
-        this.listCharacters.next(res);
-      },
-      error: (err) => {
-
-      }
-    });
-  }
-
-  getCharactersByPage(pageNumber: number) {
-    this.loadingInformation = true;
-    this._characterService.getCharactersByPage(pageNumber).subscribe(
-      {
+    this._characterService.getSingleCharacter(id)
+      .pipe(
+        takeUntil(this.destroySuscription)
+      )
+      .subscribe({
         next: (res) => {
-
-          this.listCharacters.next(res.results);
-          this.currentPage = pageNumber;
-          this.totalPages = res.info.pages;
+          const character: CharacterModel[] = [res];
+          //console.log(`Personaje por id: ${JSON.stringify(character, null, '\t')}`);
+          this.listCharacters.next(character)
           this.loadingInformation = false;
         },
-        error: (er) => {
-          console.error('Error al cargar los personajes por paginación.');
-          this.loadingInformation = false;
+        error: (err) => {
+          this.manageErrors('Error al cargar el personaje por id.', err);
         }
       });
   }
 
+  getMultipleCharactersByUrls(charUrsl: string[]) {
+    this.loadingInformation = true;
+    this._characterService.getMultipleCharactersByUrls(charUrsl)
+      .pipe(
+        takeUntil(this.destroySuscription)
+      )
+      .subscribe({
+        next: (res) => {
+          this.listCharacters.next(res);
+          this.loadingInformation = false;
+        },
+        error: (err) => {
+          this.manageErrors('Error al cargar personajes por múltiples URLs', err);
+        }
+      });
+  }
+
+  getCharactersByPage(pageNumber: number) {
+    this.loadingInformation = true;
+    this._characterService.getCharactersByPage(pageNumber)
+      .pipe(
+        takeUntil(this.destroySuscription)
+      )
+      .subscribe(
+        {
+          next: (res) => {
+            console.log('Cargado personajes por número de página: ', res.results);
+            this.manageSuccess(pageNumber, res);
+          },
+          error: (er) => {
+            this.manageErrors('Error al cargar los personajes por paginación.', er);
+          }
+        });
+  }
+
   nextPage() {
     if (this.currentPage < this.totalPages) {
-      this.getCharactersByPage(this.currentPage + 1);
+      //this.getCharactersByPage(this.currentPage + 1);
+      this.getCharactersByFiltersAndPage(this.currentPage + 1);
     }
   }
 
   previewPage() {
 
     if (this.currentPage > 1) {
-      this.getCharactersByPage(this.currentPage - 1);
+      //this.getCharactersByPage(this.currentPage - 1);
+      this.getCharactersByFiltersAndPage(this.currentPage - 1);
     }
   }
 
+
+  private filtros() {
+    const filterName = this.searchByName.valueChanges.pipe(
+      startWith(''),
+      debounceTime(500),
+      distinctUntilChanged()
+    );
+
+    const filterStatus = this.searchByStatus.valueChanges.pipe(
+      startWith(''),
+      distinctUntilChanged()
+    );
+
+    combineLatest([filterName, filterStatus])
+      .pipe(
+        takeUntil(this.destroySuscription),
+        tap(() => {
+          this.loadingInformation = true;
+          this.currentPage = 1;
+        }),
+        switchMap(([name, status]) => {
+          return this.getCharactersByFilters(this.currentPage, name, status);
+        })
+      )
+      .subscribe({
+        next: (res) => {
+          console.log('Personajes filtrados: ', res.results)
+          this.manageSuccess(this.currentPage, res);
+
+        },
+        error: (err) => {
+          this.manageErrors('Error crítico al buscar personajes con filtro.', err);
+          this.currentPage = 0;
+        }
+      });
+  }
+
+  private getCharactersByFilters(pageNumber: number, characterName: string, characterStatus: string) {
+    return this._characterService.getCharactersByFilters(pageNumber, characterName, characterStatus).pipe(
+      catchError((error) => {
+        console.error('No se encontraron personajes con filtros', error);
+        const paginationModel: PaginationModel = {
+          count: 0,
+          pages: 0,
+          next: null,
+          prev: null
+        }
+
+        const characterPaginationModel: CharacterPaginationModel = {
+          info: paginationModel,
+          results: []
+        }
+
+        return of(characterPaginationModel);
+      })
+    );
+  }
+
+  private getCharactersByFiltersAndPage(pageNumber: number) {
+    const name = this.searchByName.value;
+    const status = this.searchByStatus.value;
+    this.loadingInformation = true;
+
+    this.getCharactersByFilters(pageNumber, name, status)
+      .pipe(
+        takeUntil(this.destroySuscription)
+      )
+      .subscribe({
+        next: (res) => {
+          console.log('Personajes por filtro y página: ', res.results);
+          this.manageSuccess(pageNumber, res);
+        },
+        error: (err) => {
+          this.manageErrors('Error crítico al buscar personajes con filtro.', err);
+        }
+      });
+  }
+
+  private manageSuccess(pageNumber: number, characterPaginationModel: CharacterPaginationModel) {
+    this.listCharacters.next(characterPaginationModel.results);
+    this.totalPages = characterPaginationModel.info.pages;
+    this.currentPage = pageNumber;
+    this.loadingInformation = false;
+  }
+
+  private manageErrors(mesage: string, data: any) {
+    console.error(mesage, data);
+    this.loadingInformation = false;
+  }
 
   ngOnDestroy() {
     this.destroySuscription.next();// Cortar todas las suscripciones al instante
