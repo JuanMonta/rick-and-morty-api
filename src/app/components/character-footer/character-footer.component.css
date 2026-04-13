@@ -1,0 +1,106 @@
+.footer-contenedor {
+  height: 100%;
+  width: 100%;
+  padding: 10px;
+
+}
+
+.loading-message {
+  color: #ff9800;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 15px;
+}
+
+/* El contenedor que contendrá dos paneles */
+.footer-main {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  gap: 10px;
+  /* Espacion entre paneles*/
+}
+
+/* Para los dos paneles dentro de mi .footer-main, 50% y 50% cada uno */
+.footer-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border: 1px solid;
+}
+
+
+/* Solo para agregar otra pequeña separacion entre mis dos paneles*/
+.dividor {
+  width: 3px;
+  height: 100%;
+}
+
+/* Encabezados de mis paneles [especies, types] */
+.panel-title {
+  text-align: center;
+  font-weight: bold;
+  padding: 5px;
+  color: white;
+  text-transform: uppercase;
+
+}
+
+.title-blue {
+  background-color: #0a5377;
+}
+
+.title-green {
+  background-color: #2d921e;
+}
+
+/* Panel scrolleable */
+.panel-scroll-area {
+  /* Ocupar todo el espacio debajo del encabezado */
+  flex: 1;
+  /* Obligamos que aparesca el scrollbar */
+  min-height: 0;
+  /* Activar scrollbar vertical */
+  overflow-y: auto;
+  padding: 10px;
+
+  /* Le damos un comportamiento de FlowLayout */
+  display: flex;
+  /* Si los chips llegan al borde derecho, saltan otra linea línea */
+  flex-wrap: wrap;
+  /* Distancia entre un chip y otro */
+  gap: 8px;
+  /* Agrupar los chips de arriba hacia abajo */
+  align-content: flex-start;
+}
+
+/* DISEÑO DE LOS CHIPS */
+.chip {
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 0.9rem;
+  color: #f5f0f0;
+  /* Evita que el texto dentro de un chip se parta por la mitad en dos líneas,
+  lo cual sería malo dentro de nuestro Flowlayout ver midates de una soloa cosa */
+  white-space: nowrap;
+}
+
+.chip-species {
+  background-color: #53b3e7;
+}
+
+.chip-type {
+  background-color: #659c5d;
+}
+
+/* --- Personalizar scrollbar para que se vea un poco mas moderna ---*/
+
+.panel-scroll-area::-webkit-scrollbar {
+  width: 8px;
+}
+
+.panel-scroll-area::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 4px;
+}

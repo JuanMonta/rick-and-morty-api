@@ -210,7 +210,7 @@ export class CharacterListComponent implements OnInit {
       )
       .subscribe({
         next: (res) => {
-          console.log('Personajes por filtro y página: ', res.results);
+          //console.log('Personajes por filtro y página: ', res.results);
           this.manageSuccess(pageNumber, res);
         },
         error: (err) => {

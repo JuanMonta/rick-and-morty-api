@@ -1,1 +1,32 @@
-<p>character-footer works!</p>
+<div class="footer-contenedor">
+
+  <div *ngIf="isLoadingTotals" class="loading-message">
+    <span >⏳ Calculando totales... </span>
+  </div>
+
+  <div *ngIf="!isLoadingTotals" class="footer-main">
+
+    <div class="footer-panel">
+      <div class="panel-title title-blue">Total of especies</div>
+
+      <div class="panel-scroll-area">
+        <span class="chip chip-species" *ngFor="let sp of speciesTotales">
+          <strong>{{ sp.name }}:</strong> {{ sp.count }}
+        </span>
+      </div>
+    </div>
+
+    <div class="dividor"></div>
+
+    <div class="footer-panel">
+      <div class="panel-title title-green">Total of types</div>
+
+      <div class="panel-scroll-area">
+        <span class="chip chip-type" *ngFor="let tp of typesTotales">
+          <strong>{{ tp.name }}:</strong> {{ tp.count }}
+        </span>
+      </div>
+    </div>
+
+  </div>
+</div>
