@@ -5,6 +5,7 @@ import { takeUntil, debounceTime, distinctUntilChanged, startWith, switchMap, ca
 import { CharacterModel } from 'src/app/models/character-model';
 import { CharacterPaginationModel } from 'src/app/models/character-pagination-model';
 import { PaginationModel } from 'src/app/models/pagination-info-model';
+import { CharacterDetailsStateService } from 'src/app/services/character-details-state.service';
 import { CharacterFavoriteStateService } from 'src/app/services/character-favorite-state.service';
 import { CharacterService } from 'src/app/services/character.service';
 
@@ -31,96 +32,15 @@ export class CharacterListComponent implements OnInit {
 
   constructor(
     private readonly _characterService: CharacterService,
-    private readonly _characterFovoriteStateService: CharacterFavoriteStateService
+    private readonly _characterFavoriteStateService: CharacterFavoriteStateService,
+    private readonly _characterDetailsStateService: CharacterDetailsStateService
   ) { }
 
   ngOnInit(): void {
-    //this.getAllCharacters();
-    //this.getSingleCharacter(1);
-    //this.getCharactersByPage(this.currentPage);
-    const characterUrls = [
-      "https://rickandmortyapi.com/api/character/1",
-      "https://rickandmortyapi.com/api/character/2",
-      "https://rickandmortyapi.com/api/character/3",
-      "https://rickandmortyapi.com/api/character/4"
-    ]
-    //this.getMultipleCharactersByUrls(characterUrls);
     this.getLocalFavoriteCharacter();
     this.filtros();
   }
 
-  getAllCharacters() {
-    this.loadingInformation = true;
-    this._characterService.getAllCharacters()
-      .pipe(
-        takeUntil(this.destroySuscription)
-      )
-      .subscribe({
-        next: (res) => {
-          this.listCharacters.next(res.results);
-          console.log('Lista de personajes: ' + this.listCharacters);
-          this.loadingInformation = false;
-        },
-        error: (err) => {
-          this.manageErrors('Ocurrió un error al momento de consultar todos los personajes.', err);
-        }
-      }
-      );
-  }
-
-  getSingleCharacter(id: number) {
-    this.loadingInformation = true;
-    this._characterService.getSingleCharacter(id)
-      .pipe(
-        takeUntil(this.destroySuscription)
-      )
-      .subscribe({
-        next: (res) => {
-          const character: CharacterModel[] = [res];
-          //console.log(`Personaje por id: ${JSON.stringify(character, null, '\t')}`);
-          this.listCharacters.next(character)
-          this.loadingInformation = false;
-        },
-        error: (err) => {
-          this.manageErrors('Error al cargar el personaje por id.', err);
-        }
-      });
-  }
-
-  getMultipleCharactersByUrls(charUrsl: string[]) {
-    this.loadingInformation = true;
-    this._characterService.getMultipleCharactersByUrls(charUrsl)
-      .pipe(
-        takeUntil(this.destroySuscription)
-      )
-      .subscribe({
-        next: (res) => {
-          this.listCharacters.next(res);
-          this.loadingInformation = false;
-        },
-        error: (err) => {
-          this.manageErrors('Error al cargar personajes por múltiples URLs', err);
-        }
-      });
-  }
-
-  getCharactersByPage(pageNumber: number) {
-    this.loadingInformation = true;
-    this._characterService.getCharactersByPage(pageNumber)
-      .pipe(
-        takeUntil(this.destroySuscription)
-      )
-      .subscribe(
-        {
-          next: (res) => {
-            console.log('Cargado personajes por número de página: ', res.results);
-            this.manageSuccess(pageNumber, res);
-          },
-          error: (er) => {
-            this.manageErrors('Error al cargar los personajes por paginación.', er);
-          }
-        });
-  }
 
   nextPage() {
     if (this.currentPage < this.totalPages) {
@@ -236,9 +156,9 @@ export class CharacterListComponent implements OnInit {
     const fav = localStorage.getItem(this.localFavoriteCharacterTag);
     if (fav) {
       this.favoriteCharacter = JSON.parse(fav) as CharacterModel;
-      this._characterFovoriteStateService.setToggleFavoriteCharacter(this.favoriteCharacter);
+      this._characterFavoriteStateService.setToggleFavoriteCharacter(this.favoriteCharacter);
     } else {
-      this._characterFovoriteStateService.setToggleFavoriteCharacter(null);
+      this._characterFavoriteStateService.setToggleFavoriteCharacter(null);
       console.log('No existe personaje favorito aún.');
     }
   }
@@ -256,16 +176,20 @@ export class CharacterListComponent implements OnInit {
       //si son iguales quitamos de favoritos
       this.favoriteCharacter = null;
       localStorage.removeItem(this.localFavoriteCharacterTag);
-      this._characterFovoriteStateService.setToggleFavoriteCharacter(this.favoriteCharacter);
+      this._characterFavoriteStateService.setToggleFavoriteCharacter(this.favoriteCharacter);
     } else {
       // actulizamos en nuevo personaje favorito, al pasarle el modelo de personaje,
       // se actualizará en la tabla automáticamente.
       this.favoriteCharacter = characterModel;
       localStorage.setItem(this.localFavoriteCharacterTag, JSON.stringify(this.favoriteCharacter));
-      this._characterFovoriteStateService.setToggleFavoriteCharacter(this.favoriteCharacter);
+      this._characterFavoriteStateService.setToggleFavoriteCharacter(this.favoriteCharacter);
     }
   }
 
+
+  setSelectedCharacter(characterModel: CharacterModel | null) {
+    this._characterDetailsStateService.setSelectedCharacter(characterModel);
+  }
 
   ngOnDestroy() {
     this.destroySuscription.next();// Cortar todas las suscripciones al instante

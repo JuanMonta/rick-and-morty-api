@@ -1,36 +1,3 @@
-<!--
- <div class="pagination">
-  <button
-    (click)="previewPage()"
-    [disabled]="currentPage === 1 || loadingInformation"
-  >Anterior</button>
-
-  <span>Página {{currentPage}} de {{totalPages}}</span>
-
-  <button
-    (click)="nextPage()"
-    [disabled]="currentPage=== totalPages || loadingInformation"
-  >Siguiente</button>
-</div>
-
-<button
-  (click)="getAllCharacters()"
-  [disabled]="loadingInformation"
->Cargar todos los personajes</button>
-<div class="character-grid">
-
-  <div *ngFor="let char of listCharacters | async">
-    <img
-      [src]="char.image"
-      [alt]="char.name"
-      width="50"
-    >
-    <h3>{{char.name}}</h3>
-  </div>
-
-</div>
- -->
-
 <div>
 
   <input
@@ -67,8 +34,16 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let char of listCharacters | async">
-        <td (click)="toggleFavoriteCharacter(char)">
+      <tr
+        *ngFor="let char of listCharacters | async"
+        (click)="setSelectedCharacter(char)"
+      >
+        <!--  stopPropagation evita que el evento tambien se propague por toda la fila
+           y no solo en esta celda donde ocurre la accion.
+           Como pieda en un stanque, donde cae la piedra es el 'evento', y las olas resultantes
+           son la propagacion hacia las demas celdas de la fila.
+           -->
+        <td (click)="toggleFavoriteCharacter(char); $event.stopPropagation()">
           <span
             [ngStyle]="verificarFavoriteCharacter(char.id) ? {'opacity': '1', 'color': '#f19a0d', 'cursor': 'pointer'} : {'opacity': '0.2', 'color': 'gray', 'cursor': 'pointer'}"
           >★</span>

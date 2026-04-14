@@ -22,33 +22,8 @@ export class CharacterService {
 
   }
 
-  getAllCharacters(): Observable<CharacterPaginationModel> {
-    return this._http.get<CharacterPaginationModel>(this.apiCharacterUrl);
-  }
-
-  getSingleCharacter(id: number): Observable<CharacterModel> {
-    return this._http.get<CharacterModel>(`${this.apiCharacterUrl}/${id}`);
-  }
-
-  getMultipleCharactersByIds(ids: string[] | number[]): Observable<CharacterModel[]> {
-    const idsStringLine = ids.join(',');
-    return this._http.get<CharacterModel[]>(`${this.apiCharacterUrl}/${idsStringLine}`).pipe(
-      // Por si se trata de un solo personaje y la api para ese caso no lo devuelva como array,
-      // pues obligamos a devolver ese único personaje convertido a un array
-      map(resp => Array.isArray(resp) ? resp : [resp])
-    );
-  }
-
-  getMultipleCharactersByUrls(urls: string[]): Observable<CharacterModel[]> {
-    const characterIds = urls
-      .map(c => c.split('/').pop() as string);
-
-    //console.log(`urlsids ${characterIds}`);
-    return this.getMultipleCharactersByIds(characterIds);
-  }
-
-  getCharactersByPage(pageNumber: number): Observable<CharacterPaginationModel> {
-    return this._http.get<CharacterPaginationModel>(this.apiCharacterUrl, { params: new HttpParams().set('page', pageNumber) });
+  getDataByUrl<T>(url: string): Observable<T> {
+    return this._http.get<T>(url);
   }
 
   getCharactersByFilters(pageNumber: number, characterName: string, characterStatus: string): Observable<CharacterPaginationModel> {
@@ -124,9 +99,9 @@ export class CharacterService {
 
           }),
           // scan nos resive ahora el grupo de 3 de las peticiones que hicimos arriba
-          scan((acc, arrayOfResponses) => {
+          scan((acum, arrayOfResponses) => {
             // Guardando datos de la primera página
-            let charactersFetched = [...acc.personajes];
+            let charactersFetched = [...acum.personajes];
             // Guardando datos del resto de las páginas sumándolas al array
             arrayOfResponses.forEach(results => {
               charactersFetched = [...charactersFetched, ...results.results]
@@ -134,54 +109,21 @@ export class CharacterService {
 
             return {
               personajes: charactersFetched,
-              paginasProcesadas: acc.paginasProcesadas + arrayOfResponses.length,
+              paginasProcesadas: acum.paginasProcesadas + arrayOfResponses.length,
               paginasTotales: totalPaginas
             };
 
-          },
+          },//deficion de las varibles para mi scan, y a la vez, valores iniciales de mi acumulador (acum)
             { personajes: [...primeraPagina.results], paginasProcesadas: 1, paginasTotales: totalPaginas }
           ),
 
-          //Ahara realizamos los calculos para determinar los totales pedidos
-          map((mapear) => {
-            const conteoSpecies: any = {};
-            const conteoTypes: any = {};
-
-            mapear.personajes.forEach((c) => {
-              const specie = c.species || CHARACTER_PROGRESIVE_LOADING_CONSTS.UNKNOWN;
-              const type = c.type || CHARACTER_PROGRESIVE_LOADING_CONSTS.NONE;
-
-              conteoSpecies[specie] = (conteoSpecies[specie] || 0) + 1;
-              conteoTypes[type] = (conteoTypes[type] || 0) + 1;
-            });
-
-            // Arrays de los totales
-            const totalSpecies: CharacterProgresiveLoadingTotalsModel[] = Object.keys(conteoSpecies).map(k => {
-              return {
-                name: k,
-                count: conteoSpecies[k]
-              }
-            }
-            );
-
-            const totalTypes: CharacterProgresiveLoadingTotalsModel[] = Object.keys(conteoTypes).map(k => {
-              return {
-                name: k,
-                count: conteoTypes[k]
-              }
-            });
+          //Ahora realizamos los calculos para determinar los totales pedidos
+          map((characters) => {
+            const totales = this.calculateProgressiveTotals(characters.personajes, characters.paginasProcesadas, characters.paginasTotales);
 
             //Verificamos que todas las paginas de la api han sido consultadas
-            const isPagesPetitionComplete = mapear.paginasProcesadas >= mapear.paginasTotales;
-
-            const totales: CharacterProgresiveLoadingModel = {
-              species: totalSpecies,
-              types: totalTypes,
-              isCompleted: isPagesPetitionComplete
-            }
-
             //Si ya terminaron todas las página guardamos una caché
-            if (isPagesPetitionComplete) {
+            if (totales.isCompleted) {
               console.log('Calculo progresivo de totales terminado. Guardando en caché.');
               localStorage.setItem(this.localCharacterTotalsInfoKey, JSON.stringify(totales));
               localStorage.setItem(this.locaCharacterTotalsDate, new Date().getTime().toString());
@@ -193,6 +135,44 @@ export class CharacterService {
         );
       })
     );
+  }
+
+  private calculateProgressiveTotals(personajes: CharacterModel[],
+    paginasProcesadas: number,
+    paginasTotales: number
+  ): CharacterProgresiveLoadingModel {
+    const conteoSpecies: Record<string, number> = {};
+    const conteoTypes: Record<string, number> = {};
+    personajes.forEach((c) => {
+      const specie = c.species || CHARACTER_PROGRESIVE_LOADING_CONSTS.UNKNOWN;
+      const type = c.type || CHARACTER_PROGRESIVE_LOADING_CONSTS.NONE;
+
+      conteoSpecies[specie] = (conteoSpecies[specie] || 0) + 1;
+      conteoTypes[type] = (conteoTypes[type] || 0) + 1;
+    });
+
+    // Arrays de los totales
+    const totalSpecies: CharacterProgresiveLoadingTotalsModel[] = Object.keys(conteoSpecies).map(k => {
+      return {
+        name: k,
+        count: conteoSpecies[k]
+      }
+    }
+    );
+
+    const totalTypes: CharacterProgresiveLoadingTotalsModel[] = Object.keys(conteoTypes).map(k => {
+      return {
+        name: k,
+        count: conteoTypes[k]
+      }
+    });
+
+    const totales: CharacterProgresiveLoadingModel = {
+      species: totalSpecies,
+      types: totalTypes,
+      isCompleted: paginasProcesadas >= paginasTotales
+    }
+    return totales;
   }
 
 }

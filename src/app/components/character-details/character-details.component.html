@@ -1,1 +1,39 @@
-<p>character-details works!</p>
+<div class="contenedor-detalles">
+
+  <div
+    *ngIf="fullCharacterDetails | async as details; else sinSeleccion"
+    class="character-tarjeta"
+  >
+
+    <div class="tarjeta-header">
+      <img
+        [src]="details.character.image"
+        [alt]="details.character.name"
+        class="character-image"
+      >
+      <h2>{{ details.character.name }}</h2>
+    </div>
+
+    <div class="lista-info">
+      <p><strong>Species:</strong> {{ details.character.species }}</p>
+
+      <p><strong>Origin:</strong> {{ details.originInfo.name }}</p>
+      <p> -Origin Resident: {{ details.originInfo.resident }}</p>
+
+      <p><strong>Location:</strong> {{ details.locationInfo.name }}</p>
+      <p> -Location Resident: {{ details.locationInfo.resident }}</p>
+
+      <p><strong>Aparition (Episode):</strong> {{ details.episode.episode }} - {{ details.episode.name }}</p>
+
+    </div>
+
+  </div>
+
+  <ng-template #sinSeleccion>
+    <div class="noSelected">
+      <h2>CHARACTER DETAILS</h2>
+      <p>Please, first select a character from the list.</p>
+    </div>
+  </ng-template>
+
+</div>

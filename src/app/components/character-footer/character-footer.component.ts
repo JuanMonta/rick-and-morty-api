@@ -33,7 +33,6 @@ export class CharacterFooterComponent implements OnInit {
       .subscribe(
         {
           next: (totales) => {
-            console.log('Cargando totales progresivos par html');
             this.speciesTotales = totales.species;
             this.typesTotales = totales.types.filter(f => f.name !== CHARACTER_PROGRESIVE_LOADING_CONSTS.NONE);
             this.isLoadingTotals = false;

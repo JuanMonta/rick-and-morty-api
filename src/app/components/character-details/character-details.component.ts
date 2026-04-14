@@ -1,4 +1,24 @@
 import { Component, OnInit } from '@angular/core';
+import { forkJoin, Observable, of } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
+import { CharacterModel } from 'src/app/models/character-model';
+import { EpisodeModel } from 'src/app/models/episode-model';
+import { LocationModel } from 'src/app/models/location-model';
+import { CharacterDetailsStateService } from 'src/app/services/character-details-state.service';
+import { CharacterService } from 'src/app/services/character.service';
+
+interface BasicInfo {
+  name: string,
+  resident: string
+}
+
+interface FullCharacterDetails {
+  character: CharacterModel,
+  originInfo: BasicInfo,
+  locationInfo: BasicInfo,
+  episode: EpisodeModel
+}
+
 
 @Component({
   selector: 'app-character-details',
@@ -7,9 +27,171 @@ import { Component, OnInit } from '@angular/core';
 })
 export class CharacterDetailsComponent implements OnInit {
 
-  constructor() { }
+  fullCharacterDetails!: Observable<FullCharacterDetails | null>;
+
+  constructor(
+    readonly _characterDetailsStateService: CharacterDetailsStateService,
+    readonly _characterService: CharacterService
+  ) { }
 
   ngOnInit(): void {
+
+    this.getFullCharacterDetails();
   }
 
+  private getFullCharacterDetails() {
+
+    this.fullCharacterDetails = this._characterDetailsStateService.selectedCharacter.pipe(
+      // Aqui tengo al personaje seleccionado
+      switchMap((char) => {
+        // verificar si está seleccionado un personaje
+        if (!char) {
+          return of(null);
+        }
+
+        return forkJoin({
+          origen: this.getOriginData(char),
+          location: this.getLocationData(char),
+          episodio: this.getEpisodeData(char)
+        })
+        .pipe(
+          map(fork => {
+            const fullData: FullCharacterDetails = {
+              character: char,
+              originInfo: fork.origen,
+              locationInfo: fork.location,
+              episode: fork.episodio
+            }
+            return fullData;
+          })
+        );
+
+      })
+    );
+  }
+  /**
+   * Obtener la informacion de origin del personaje, y un residente que
+   * comparte ese origin del personaje seleccionado.
+   * Origin la api arroja un Location, es decir ambos son lo mismo un LocationModel,
+   * pero de diferente nombre en su respectivo endpoint
+   * @param char Personaje seleccionado
+   */
+  private getOriginData(char: CharacterModel) {
+    //---- Para el origen necesitamos armar, el nombre
+    // y el nombre de un personaje que comparte ese origen ----
+
+    //Un personaje tiene un origen que es un LocationModel
+    // por ende, consultamos si tiene un origen, caso contrario
+    // guardamos datos por defautl en la interface BasicInfo
+    const origen: Observable<BasicInfo> = char.origin.url ?
+
+      //si existe el origen, el origen es un LocationModel,
+      //consultamos qué personajes tiene existen en esa Location
+      this._characterService.getDataByUrl<LocationModel>(char.origin.url).pipe(
+        switchMap(location => {
+          //Los residentes son de tipo CharacterModel
+          return location.residents.length > 0 ?
+            //si tenemos personajes en esa location, entonces porfin tenemos
+            // un nombre de personaje(s) que vive(n) en un origin,
+            // y podremos completar nuestro Observable<BasicInfo>
+            this._characterService.getDataByUrl<CharacterModel>(location.residents[0]).pipe(
+              map(resChar => {
+                const basic: BasicInfo = {
+                  name: location.name,
+                  resident: resChar.name
+                }
+                return basic;
+              })
+            ) :
+            //si no tenemos personajes, devolvemos un observable por default
+            // a nuestra variable origen: Observable<BasicInfo>,
+            // almenos con el nombre del origen que es un location
+            of({ name: location.name, resident: "None" })
+        }),
+        //Por si surge un error al consultar la Location para obtener
+        //el nombre del personaje que existe en esa Location
+        catchError(() => {
+          const basic: BasicInfo = {
+            name: char.location.name,
+            resident: 'Error'
+          }
+          return of(basic);
+        })
+      )
+      // si no hay location que consultar, pues entonces
+      // devolvemo un observable con valores por default
+      // a nuestra variable origen: Observable<BasicInfo>,
+      // almenos con el nombre del origen del personaje
+      : of({ name: char.origin.name, resident: 'None' });
+
+    return origen;
+  }
+
+  /**
+   * Obtener la location de un personaje seleccionado,
+   * obtener un residente que comparte esa location
+   * del personaje seleccionado.
+   * @param char Personaje seleccionado
+   * @returns Observable<BasicInfo>
+   */
+  private getLocationData(char: CharacterModel) {
+    // Teniendo el personaje seleccionado, partimos a anidar las peticiones.
+    // La location devuelve un LocationModel
+    const location: Observable<BasicInfo> = char.location.url ?
+
+      // si el personaje tiene una location, entonces podemos usar la LocationModel
+      // que devuelve la consulta de location, dentro de LocationModel tambien
+      // llegan las url de los personajes
+      this._characterService.getDataByUrl<LocationModel>(char.location.url).pipe(
+        //verificamos que haya personajes
+        switchMap(loc => loc.residents.length > 0 ?
+          // si hay personajes, entonces ya tenemos nuestros datos para Observable<BasicInfo>,
+          // que seria tener el nombre de la location y el nombre del residente de esa location;
+          this._characterService.getDataByUrl<CharacterModel>(loc.residents[0]).pipe(
+            map(resident => {
+              const basic: BasicInfo = {
+                name: loc.name,
+                resident: resident.name
+              }
+              return basic;
+            })
+          ) :
+          // si no hay personajes, entonces armamos un Observable<BasicInfo> por defecto,
+          // al menos con el nombre de la location.
+          of({ name: loc.name, resident: 'None' })
+        ),
+        // por si hay un error, entonces armamos un Observable<BasicInfo> por defecto,
+        // al menos con el nombre de la location.
+        catchError(() => of({ name: char.location.name, resident: 'Error' }))
+      )
+      :
+      of({ name: char.location.name, resident: 'None' })
+      ;
+
+    return location;
+  }
+
+  private getEpisodeData(char: CharacterModel) {
+    const espisode: Observable<EpisodeModel> = char.episode.length > 0 ?
+      this._characterService.getDataByUrl<EpisodeModel>(char.episode[0]).pipe(
+        catchError(() => {
+          const defaultEpisode: EpisodeModel = {
+            id: 0,
+            name: '',
+            air_date: '',
+            episode: '',
+            characters: ''
+          }
+          return of(defaultEpisode);
+        })
+      )
+      : of({
+        id: 0,
+        name: '',
+        air_date: '',
+        episode: '',
+        characters: ''
+      })
+    return espisode;
+  }
 }
