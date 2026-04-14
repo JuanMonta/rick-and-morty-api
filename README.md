@@ -1,27 +1,55 @@
-# RickAndMortyApi
+# Rick and Morty API Explorer - Angular SPA
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.18.
+Una Single Page Application (SPA) robusta desarrollada en **Angular 12**, diseñada para consumir y presentar datos de la API pública de Rick and Morty. .
 
-## Development server
+## ✨ Características Principales y Arquitectura
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+* **Gestión de Estado Centralizada:** Usando `BehaviorSubject` de RxJS para la comunicación entre componentes hermanos (Lista, Header y Detalles) sin depender de `@Input()` o `@Output()` (evitando el *prop drilling*).
 
-## Code scaffolding
+* **Programación Reactiva Avanzada (RxJS):** * Implementación de **Formularios Reactivos** acoplados a observables (`debounceTime`, `distinctUntilChanged`, `switchMap`) para búsquedas en tiempo real optimizadas, evitando la saturación del servidor.
+  * Uso de `forkJoin` y `switchMap` para orquestar peticiones HTTP anidadas y paralelas (extrayendo datos complejos de Origen, Localización y Episodios).
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+* **Carga Progresiva y Control de Concurrencia:** Implementación de `concatMap`, `bufferCount` y `scan` para descargar toda la base de datos de forma progresiva por lotes, protegiendo la API de errores `429 Too Many Requests`.
 
-## Build
+* **Caché Inteligente (TTL):** Sistema de almacenamiento en `localStorage` con caducidad de 24 horas para operaciones matemáticas pesadas (cálculo de totales globales de la base de datos de la API), reduciendo las peticiones de red a 0 en recargas posteriores.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+* **Diseño UI/UX Inmutable:** Maquetación construida 100% con CSS Flexbox y Grid. La pantalla se mantiene anclada (sin scroll global), permitiendo desplazamientos independientes en tablas de datos y paneles.
 
-## Running unit tests
+## 🛠️ Stack Tecnológico
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+* **Framework:** Angular 12
+* **Librerías:** RxJS
+* **Estilos:** CSS3 puro (Flexbox, CSS Grid)
+* **Fuente de Datos:** [The Rick and Morty REST API](https://rickandmortyapi.com/)
 
-## Running end-to-end tests
+## 🚀 Instalación y Ejecución Local
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+Para ejecutar este proyecto en tu entorno local, sigue estos pasos:
 
-## Further help
+1. Clona este repositorio:
+```bash
+git clone https://github.com/JuanMonta/rick-and-morty-api.git
+```
+2. Navega al directorio del proyecto.
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+```bash
+cd rick-and-morty-api
+```
+
+3. Instala las dependencias necesarias:
+```bash
+npm install
+```
+
+4. Levanta el servidor de desarrollo:
+```bash
+ng serve
+```
+
+5. Abre el navegador y visita `http://localhost:4200` que por lo general es la dirección con el puerto por defecto, si por alguna razón no estas seguro, héchale un vistazo a la terminal cuando levantes el servidor con `ng serve`
+
+```bash
+http://localhost:4200
+```
+##
+##  👤 Autor: Juan Monta
