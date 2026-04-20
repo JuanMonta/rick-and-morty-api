@@ -7,6 +7,7 @@ import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CharacterLayoutComponent } from './character/character-layout/character-layout.component';
 import { RouterModule } from '@angular/router';
+import { CharacterTableComponent } from './character/character-table/character-table.component';
 
 @NgModule({
   declarations: [
@@ -15,6 +16,8 @@ import { RouterModule } from '@angular/router';
     CharacterHeaderComponent,
     CharacterDetailsComponent,
     CharacterFooterComponent,
+    CharacterTableComponent,
+    CharacterTableComponent
   ],
   imports: [
     CommonModule,
@@ -23,4 +26,4 @@ import { RouterModule } from '@angular/router';
   ],
   providers: [DatePipe],
 })
-export class CharacterModule {}
+export class CharacterModule { }
