@@ -18,19 +18,14 @@ export class CharacterListComponent implements OnInit {
   searchByName = new FormControl('');
   searchByStatus = new FormControl('');
 
-  private readonly localFavoriteCharacterTag = 'favoriteCharacter';
-  favoriteCharacter!: CharacterModel | null;
 
   constructor(
-    readonly _characterListFacade: CharacterListFacade,
-    private readonly _characterFavoriteStateService: CharacterFavoriteStateService,
-    private readonly _characterDetailsStateService: CharacterDetailsStateService,
-  ) {}
+    readonly _characterListFacade: CharacterListFacade
+  ) { }
 
   ngOnInit(): void {
-    this.getLocalFavoriteCharacter();
     this.filtros();
-    this._characterListFacade.loadCharacters(1,"","");
+    this._characterListFacade.loadCharacters(1, "", "");
   }
 
   nextPage() {
@@ -64,55 +59,8 @@ export class CharacterListComponent implements OnInit {
     });
   }
 
-  private getLocalFavoriteCharacter() {
-    const fav = localStorage.getItem(this.localFavoriteCharacterTag);
-    if (fav) {
-      this.favoriteCharacter = JSON.parse(fav) as CharacterModel;
-      this._characterFavoriteStateService.setToggleFavoriteCharacter(
-        this.favoriteCharacter,
-      );
-    } else {
-      this._characterFavoriteStateService.setToggleFavoriteCharacter(null);
-      console.log('No existe personaje favorito aún.');
-    }
-  }
 
-  verificarFavoriteCharacter(characterId: number) {
-    if (this.favoriteCharacter) {
-      return this.favoriteCharacter.id === characterId;
-    } else {
-      return false;
-    }
-  }
 
-  toggleFavoriteCharacter(characterModel: CharacterModel) {
-    if (
-      this.favoriteCharacter &&
-      this.favoriteCharacter.id === characterModel.id
-    ) {
-      //si son iguales quitamos de favoritos
-      this.favoriteCharacter = null;
-      localStorage.removeItem(this.localFavoriteCharacterTag);
-      this._characterFavoriteStateService.setToggleFavoriteCharacter(
-        this.favoriteCharacter,
-      );
-    } else {
-      // actulizamos en nuevo personaje favorito, al pasarle el modelo de personaje,
-      // se actualizará en la tabla automáticamente.
-      this.favoriteCharacter = characterModel;
-      localStorage.setItem(
-        this.localFavoriteCharacterTag,
-        JSON.stringify(this.favoriteCharacter),
-      );
-      this._characterFavoriteStateService.setToggleFavoriteCharacter(
-        this.favoriteCharacter,
-      );
-    }
-  }
-
-  setSelectedCharacter(characterModel: CharacterModel | null) {
-    this._characterDetailsStateService.setSelectedCharacter(characterModel);
-  }
 
   ngOnDestroy() {
     this.destroySuscription.next(); // Cortar todas las suscripciones al instante
