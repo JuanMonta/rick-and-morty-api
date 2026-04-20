@@ -1,0 +1,106 @@
+<div>
+  <input
+    type="text"
+    placeholder="Search by name..."
+    [formControl]="searchByName"
+  />
+  <button
+    (click)="searchByName.setValue('')"
+    *ngIf="searchByName.value"
+  >
+    X
+  </button>
+
+  <label> Status Filter </label>
+  <select [formControl]="searchByStatus">
+    <option value="">Default</option>
+    <option value="alive">Alive</option>
+    <option value="dead">Dead</option>
+    <option value="unknown">Unknown</option>
+  </select>
+</div>
+
+<ng-container *ngIf="{
+    listCharacters: _characterListFacade.listCharacter$,
+    currentPage: _characterListFacade.currentPage$ | async,
+    isLoadingInformation: _characterListFacade.isLoadingInformation$ | async,
+    totalPages: _characterListFacade.totalPages$ | async
+  } as pagination">
+
+  <div class="contenedor-tabla">
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th>NAME</th>
+          <th>STATUS</th>
+          <th>SPECIES</th>
+          <th>TYPE</th>
+          <th>GENDER</th>
+          <th>CREATED</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let char of pagination.listCharacters | async"
+          (click)="setSelectedCharacter(char)"
+        >
+          <!--  stopPropagation evita que el evento tambien se propague por toda la fila
+           y no solo en esta celda donde ocurre la accion.
+           Como pieda en un stanque, donde cae la piedra es el 'evento', y las olas resultantes
+           son la propagacion hacia las demas celdas de la fila.
+           -->
+          <td (click)="toggleFavoriteCharacter(char); $event.stopPropagation()">
+            <span [ngStyle]="
+              verificarFavoriteCharacter(char.id)
+                ? { opacity: '1', color: '#f19a0d', cursor: 'pointer' }
+                : { opacity: '0.2', color: 'gray', cursor: 'pointer' }
+            ">★</span>
+          </td>
+          <td>
+            <span>
+              <img
+                [src]="char.image"
+                [alt]="char.name"
+                width="40"
+                height="40"
+              >
+            </span>
+          </td>
+          <td>{{ char.name }}</td>
+          <td>{{ char.status }}</td>
+          <td>{{ char.species }}</td>
+          <td>{{ char.type }}</td>
+          <td>{{ char.gender }}</td>
+          <td>{{ char.created | date: "dd/MMM/y h:mm:ss a" }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+  <div class="pagination">
+    <button
+      (click)="previewPage()"
+      [disabled]="
+        pagination.currentPage === 1 || pagination.isLoadingInformation === true
+      "
+    >
+      Anterior
+    </button>
+
+    <span>
+      Página {{ pagination.currentPage }} de {{ pagination.totalPages }}
+    </span>
+
+    <button
+      (click)="nextPage()"
+      [disabled]="
+        pagination.currentPage === pagination.totalPages ||
+        pagination.isLoadingInformation === true
+      "
+    >
+      Siguiente
+    </button>
+  </div>
+</ng-container>

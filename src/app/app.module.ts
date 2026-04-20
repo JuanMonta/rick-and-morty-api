@@ -1,29 +1,13 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
-
 import { AppComponent } from './app.component';
-import { CharacterListComponent } from './components/character-list/character-list.component';
-import { CharacterHeaderComponent } from './components/character-header/character-header.component';
-import { CharacterFooterComponent } from './components/character-footer/character-footer.component';
-import { CharacterDetailsComponent } from './components/character-details/character-details.component';
-import { DatePipe } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
+import { AppRoutingModule } from './app-routing.module';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    CharacterListComponent,
-    CharacterHeaderComponent,
-    CharacterDetailsComponent,
-    CharacterFooterComponent
-  ],
-  imports: [
-    BrowserModule,
-    HttpClientModule,
-    ReactiveFormsModule
-  ],
-  providers: [DatePipe],
-  bootstrap: [AppComponent]
+  declarations: [AppComponent],
+  imports: [BrowserModule, HttpClientModule, AppRoutingModule],
+  providers: [],
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
