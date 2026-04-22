@@ -2,9 +2,6 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Subject, combineLatest } from 'rxjs';
 import { debounceTime, distinctUntilChanged, startWith } from 'rxjs/operators';
-import { CharacterModel } from 'src/app/models/character-model';
-import { CharacterDetailsStateService } from 'src/app/services/character-details-state.service';
-import { CharacterFavoriteStateService } from 'src/app/services/character-favorite-state.service';
 import { CharacterListFacade } from 'src/app/services/character-list.facade';
 
 @Component({

@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CharacterModel } from 'src/app/models/character-model';
-import { CharacterDetailsStateService } from 'src/app/services/character-details-state.service';
+import { CharacterDetailsFacade } from 'src/app/services/character-details.facade';
 import { CharacterFavoriteStateService } from 'src/app/services/character-favorite-state.service';
 
 @Component({
@@ -16,7 +16,7 @@ export class CharacterTableComponent implements OnInit {
   favoriteCharacter!: CharacterModel | null;
 
   constructor(
-    private readonly _characterDetailsStateService: CharacterDetailsStateService,
+    private readonly _characterDetailsFacade: CharacterDetailsFacade,
     private readonly _characterFavoriteStateService: CharacterFavoriteStateService
   ) { }
 
@@ -73,7 +73,7 @@ export class CharacterTableComponent implements OnInit {
   }
 
   setSelectedCharacter(characterModel: CharacterModel | null) {
-    this._characterDetailsStateService.setSelectedCharacter(characterModel);
+    this._characterDetailsFacade.setSelectedCharacter(characterModel);
   }
 
 }
