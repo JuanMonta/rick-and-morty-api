@@ -26,6 +26,10 @@ export class CharacterService {
     return this._http.get<T>(url);
   }
 
+  getSingleCharacter(characterId: number | string): Observable<CharacterModel> {
+    return this._http.get<CharacterModel>(this.apiCharacterUrl, { params: new HttpParams().set('id', characterId) });
+  }
+
   getCharactersByFilters(pageNumber: number, characterName: string, characterStatus: string): Observable<CharacterPaginationModel> {
     let httpParams = new HttpParams().set('page', pageNumber.toString());
 
