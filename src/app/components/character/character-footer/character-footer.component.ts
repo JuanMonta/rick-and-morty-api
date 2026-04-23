@@ -11,7 +11,7 @@ import { CharacterService } from 'src/app/services/character.service';
 @Component({
   selector: 'app-character-footer',
   templateUrl: './character-footer.component.html',
-  styleUrls: ['./character-footer.component.css'],
+  styleUrls: ['./character-footer.component.css']
 })
 export class CharacterFooterComponent implements OnInit {
   private destroySuscription = new Subject<void>();
@@ -21,7 +21,7 @@ export class CharacterFooterComponent implements OnInit {
   speciesTotales: CharacterProgresiveLoadingTotalsModel[] = [];
   typesTotales: CharacterProgresiveLoadingTotalsModel[] = [];
 
-  constructor(private readonly _characterService: CharacterService) {}
+  constructor(private readonly _characterService: CharacterService) { }
 
   ngOnInit(): void {
     this.getGlobalTotalsProgressive();

@@ -8,6 +8,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { CharacterLayoutComponent } from './character/character-layout/character-layout.component';
 import { RouterModule } from '@angular/router';
 import { CharacterTableComponent } from './character/character-table/character-table.component';
+import { CharacterFooterTotalsComponent } from './character/character-footer-totals/character-footer-totals.component';
 
 @NgModule({
   declarations: [
@@ -17,7 +18,7 @@ import { CharacterTableComponent } from './character/character-table/character-t
     CharacterDetailsComponent,
     CharacterFooterComponent,
     CharacterTableComponent,
-    CharacterTableComponent
+    CharacterFooterTotalsComponent
   ],
   imports: [
     CommonModule,

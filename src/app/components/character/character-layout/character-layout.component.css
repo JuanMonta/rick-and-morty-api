@@ -1,6 +1,7 @@
 /* Bloqueamos el tamaño al 100% de la pantalla y prohibimos el scroll global */
 .pantalla-completa {
-  height: 100vh; /*100 de la pantalla (ViewPort Height)*/
+  /*100 de la pantalla (ViewPort Height)*/
+  height: 100vh;
   display: flex;
   flex-direction: column;
   /* Esto es como poner resizable=false en Java, evitamos que se empuje la pantalla */
@@ -22,6 +23,7 @@
 .contenedor-bottom {
   height: 20vh;
   background-color: #f5f0f0;
+  border-top: 2px solid #ddd;
 }
 
 .column-left {

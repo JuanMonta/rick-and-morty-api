@@ -1,32 +1,30 @@
 <div class="footer-contenedor">
 
-  <div *ngIf="isLoadingTotals" class="loading-message">
-    <span >⏳ Calculando totales... </span>
+  <div
+    *ngIf="isLoadingTotals"
+    class="loading-message"
+  >
+    <span>⏳ Calculando totales... </span>
   </div>
 
-  <div *ngIf="!isLoadingTotals" class="footer-main">
+  <div
+    *ngIf="!isLoadingTotals"
+    class="footer-main"
+  >
 
-    <div class="footer-panel">
-      <div class="panel-title title-blue">Total of especies</div>
-
-      <div class="panel-scroll-area">
-        <span class="chip chip-species" *ngFor="let sp of speciesTotales">
-          <strong>{{ sp.name }}:</strong> {{ sp.count }}
-        </span>
-      </div>
-    </div>
+    <app-character-footer-totals
+      title="Total of species"
+      [chipData]="speciesTotales"
+    ></app-character-footer-totals>
 
     <div class="dividor"></div>
 
-    <div class="footer-panel">
-      <div class="panel-title title-green">Total of types</div>
+    <app-character-footer-totals
+      title="Total of types"
+      [chipData]="typesTotales"
+    ></app-character-footer-totals>
 
-      <div class="panel-scroll-area">
-        <span class="chip chip-type" *ngFor="let tp of typesTotales">
-          <strong>{{ tp.name }}:</strong> {{ tp.count }}
-        </span>
-      </div>
-    </div>
+    <div class="dividor"></div>
 
   </div>
 </div>
