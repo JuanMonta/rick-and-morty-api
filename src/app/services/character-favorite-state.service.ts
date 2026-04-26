@@ -6,14 +6,35 @@ import { CharacterModel } from '../models/character-model';
   providedIn: 'root'
 })
 export class CharacterFavoriteStateService {
+  private readonly localFavoriteCharacterTag = 'favoriteCharacter';
+
   // Para informar a nuestro character-foote.component sobre
   // la seleccion del personaje favorito
-  favoriteCharacter = new BehaviorSubject<CharacterModel | null>(null);
+  private favoriteCharacterSubject = new BehaviorSubject<CharacterModel | null>(this.getLocalFavoriteCharacter());
+  favoriteCharacter$ = this.favoriteCharacterSubject.asObservable();
+
 
   constructor() { }
 
-  setToggleFavoriteCharacter(characterModel: CharacterModel | null){
-    this.favoriteCharacter.next(characterModel);
+  private getLocalFavoriteCharacter(): CharacterModel | null {
+    const fav = localStorage.getItem(this.localFavoriteCharacterTag);
+    return fav ? JSON.parse(fav) as CharacterModel : null;
+  }
+
+  setToggleFavoriteCharacter(characterModel: CharacterModel | null) {
+    if (characterModel) {
+
+      if (characterModel.id == this.favoriteCharacterSubject.value?.id) {
+        localStorage.removeItem(this.localFavoriteCharacterTag);
+      } else {
+        localStorage.setItem(this.localFavoriteCharacterTag, JSON.stringify(characterModel));
+      }
+
+    } else {// si character llega null
+      localStorage.removeItem(this.localFavoriteCharacterTag);
+    }
+
+    this.favoriteCharacterSubject.next(characterModel);
   }
 
 }

@@ -15,7 +15,7 @@
     <tbody>
       <tr
         *ngFor="let char of characters"
-        (click)="setSelectedCharacter(char)"
+        (click)="toggleFavoriteCharacter(char)"
       >
         <!--  stopPropagation evita que el evento tambien se propague por toda la fila
            y no solo en esta celda donde ocurre la accion.
@@ -23,8 +23,9 @@
            son la propagacion hacia las demas celdas de la fila.
            -->
         <td (click)="toggleFavoriteCharacter(char); $event.stopPropagation()">
-          <span [ngStyle]="
-              verificarFavoriteCharacter(char.id)
+          <ng-container></ng-container>
+          <span [ngStyle]=" ((_characterFavoriteStateService.favoriteCharacter$ |async)?.id === char.id)
+
                 ? { opacity: '1', color: '#f19a0d', cursor: 'pointer' }
                 : { opacity: '0.2', color: 'gray', cursor: 'pointer' }
             ">★</span>

@@ -1,7 +1,7 @@
 <span>★ MY FAVORITE CHARACTER</span>
 <div
   class="header-favorito"
-  *ngIf="_characterFavoriteStateService.favoriteCharacter | async as favorito ; else sinFavorito"
+  *ngIf="_characterFavoriteStateService.favoriteCharacter$ | async as favorito ; else sinFavorito"
 >
 
   <div
