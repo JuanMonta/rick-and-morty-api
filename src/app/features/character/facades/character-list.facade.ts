@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { CharacterModel } from '../models/character-model';
-import { CharacterService } from './character.service';
 import { catchError, map, switchMap } from 'rxjs/operators';
+import { CharacterModel } from 'src/app/features/character/models/character-model';
+import { CharacterService } from '../services/character.service';
 
 interface FetchTrigger {
   page: number,

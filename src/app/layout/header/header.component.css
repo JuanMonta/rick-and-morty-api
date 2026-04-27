@@ -1,0 +1,39 @@
+.header-favorito {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  padding-top: 10px;
+}
+
+.primary-section {
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.character-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.character-img {
+  object-fit: cover;
+}
+
+.character-name {
+  margin: 0;
+  padding-left: 10px;
+}
+
+
+.info-section {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  padding-left: 10px;
+}
+
+.info-section p {
+  margin: 0;
+}

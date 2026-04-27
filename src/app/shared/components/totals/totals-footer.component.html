@@ -1,0 +1,12 @@
+<div class="footer-panel">
+  <div class="panel-title title-blue">{{title}}</div>
+
+  <div class="panel-scroll-area">
+    <span
+      class="chip chip-species"
+      *ngFor="let totals of chipData"
+    >
+      <strong>{{ totals.name }}:</strong> {{ totals.count }}
+    </span>
+  </div>
+</div>

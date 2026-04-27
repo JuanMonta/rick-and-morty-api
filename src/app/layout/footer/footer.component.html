@@ -11,18 +11,17 @@
     *ngIf="(_characterFooterFacade.totals$ |async) as totals"
     class="footer-main"
   >
-
-    <app-character-footer-totals
+    <app-totals-footer
       title="Total of species"
       [chipData]="totals.totalOfSpecies"
-    ></app-character-footer-totals>
+    ></app-totals-footer>
 
     <div class="dividor"></div>
 
-    <app-character-footer-totals
+    <app-totals-footer
       title="Total of types"
       [chipData]="totals.totalOfTypes"
-    ></app-character-footer-totals>
+    ></app-totals-footer>
 
     <div class="dividor"></div>
 

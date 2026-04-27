@@ -1,0 +1,54 @@
+.contenedor-detalles {
+  height: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+
+.character-tarjeta {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.tarjeta-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.character-image {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+.tarjeta-header h2 {
+  margin: 0;
+}
+
+.lista-info {
+  background: white;
+  padding: 20px;
+  /* Ocupar todo el resto del espacio hacia abajo */
+  flex: 1;
+  /* Activar un scroll cuando la informacion es muy larga */
+  overflow-y: auto;
+}
+
+.lista-info p {
+  margin: 8px 0;
+  font-size: 0.95rem;
+  padding-bottom: 8px;
+}
+
+.noSelected {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  color: #525050;
+  text-align: center;
+}

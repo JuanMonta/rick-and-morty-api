@@ -1,7 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { CharacterModel } from 'src/app/models/character-model';
-import { CharacterDetailsFacade } from 'src/app/services/character-details.facade';
-import { CharacterFavoriteStateService } from 'src/app/services/character-favorite-state.service';
+import { CharacterModel } from 'src/app/features/character/models/character-model';
+import { CharacterFavoriteStateService } from '../../services/character-favorite-state.service';
 
 @Component({
   selector: 'app-character-table',

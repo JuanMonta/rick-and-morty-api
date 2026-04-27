@@ -25,16 +25,3 @@
   background-color: #f5f0f0;
   border-top: 2px solid #ddd;
 }
-
-.column-left {
-  flex: 1;
-  /* Le decimos que no puede ser más grande que su contenedor padre */
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.column-rigth {
-  flex: 1;
-  height: 100%;
-}

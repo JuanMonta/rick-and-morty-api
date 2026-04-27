@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http'
-import { forkJoin, from, Observable, of } from 'rxjs';
-import { buffer, bufferCount, concatMap, delay, map, mergeMap, scan } from 'rxjs/operators'
-import { CharacterPaginationModel } from '../models/character-pagination-model';
+import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { CharacterModel } from '../models/character-model';
-import { CHARACTER_PROGRESIVE_LOADING_CONSTS, CharacterProgresiveLoadingModel, CharacterProgresiveLoadingTotalsModel } from '../models/character-progresive-loading.model';
+import { CharacterModel } from 'src/app/features/character/models/character-model';
+import { CharacterPaginationModel } from 'src/app/features/character/models/character-pagination-model';
 
 
 @Injectable({
@@ -14,9 +12,6 @@ import { CHARACTER_PROGRESIVE_LOADING_CONSTS, CharacterProgresiveLoadingModel, C
 export class CharacterService {
 
   private readonly apiCharacterUrl = environment.apiUrl + environment.endpoints.character;
-
-  private readonly localCharacterTotalsInfoKey = 'charactersTotals';
-  private readonly locaCharacterTotalsDate = 'charactersTotalsDate';
 
   constructor(private readonly _http: HttpClient) {
 
