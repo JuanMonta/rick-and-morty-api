@@ -1,0 +1,68 @@
+<div class="character-view-container">
+
+  <section class="column-left">
+
+    <div class="filtros-container">
+      <input
+        type="text"
+        placeholder="Search by name..."
+        [formControl]="searchByName"
+      />
+      <button
+        (click)="searchByName.setValue('')"
+        *ngIf="searchByName.value"
+      >
+        X
+      </button>
+
+      <label> Status Filter </label>
+      <select [formControl]="searchByStatus">
+        <option value="">Default</option>
+        <option value="alive">Alive</option>
+        <option value="dead">Dead</option>
+        <option value="unknown">Unknown</option>
+      </select>
+    </div>
+
+    <ng-container *ngIf="{
+        listCharacters: (_characterListFacade.listCharacter$ | async) ?? [],
+        currentPage: _characterListFacade.currentPage$ | async,
+        isLoadingInformation: _characterListFacade.isLoadingInformation$ | async,
+        totalPages: _characterListFacade.totalPages$ | async
+      } as pagination">
+
+      <app-character-table [characters]="pagination.listCharacters"></app-character-table>
+
+      <div class="paginacion-container">
+        <button
+          (click)="previewPage()"
+          [disabled]="
+            pagination.currentPage === 1 || pagination.isLoadingInformation === true
+          "
+        >
+          Anterior
+        </button>
+
+        <span>
+          Página {{ pagination.currentPage }} de {{ pagination.totalPages }}
+        </span>
+
+        <button
+          (click)="nextPage()"
+          [disabled]="
+            pagination.currentPage === pagination.totalPages ||
+            pagination.isLoadingInformation === true
+          "
+        >
+          Siguiente
+        </button>
+      </div>
+    </ng-container>
+
+  </section>
+
+  <section class="column-right">
+    <app-character-details></app-character-details>
+  </section>
+
+</div>

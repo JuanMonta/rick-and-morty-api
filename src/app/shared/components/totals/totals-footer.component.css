@@ -1,0 +1,88 @@
+:host {
+  /* Esto obliga a que el componente crezca y ocupe espacio */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  /* Evita que el componente se desborde si el contenido es largo */
+  min-width: 0;
+}
+
+/* Para los dos paneles dentro de mi .footer-main, 50% y 50% cada uno */
+.footer-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border: 1px solid #ddd;
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Encabezados de mis paneles [especies, types] */
+.panel-title {
+  text-align: center;
+  font-weight: bold;
+  padding: 5px;
+  color: white;
+  text-transform: uppercase;
+
+}
+
+.title-blue {
+  background-color: #0a5377;
+}
+
+.title-green {
+  background-color: #2d921e;
+}
+
+/* Panel scrolleable */
+.panel-scroll-area {
+  /* Ocupar todo el espacio debajo del encabezado */
+  flex: 1;
+  /* Obligamos que aparesca el scrollbar */
+  min-height: 0;
+  /* Activar scrollbar vertical */
+  overflow-y: auto;
+  padding: 10px;
+
+  /* Le damos un comportamiento de FlowLayout */
+  display: flex;
+  /* Si los chips llegan al borde derecho, saltan otra linea línea */
+  flex-wrap: wrap;
+  /* Distancia entre un chip y otro */
+  gap: 8px;
+  /* Agrupar los chips de arriba hacia abajo */
+  align-content: flex-start;
+}
+
+/* DISEÑO DE LOS CHIPS */
+.chip {
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 0.9rem;
+  color: #f5f0f0;
+  /* Evita que el texto dentro de un chip se parta por la mitad en dos líneas,
+  lo cual sería malo dentro de nuestro Flowlayout ver midates de una soloa cosa */
+  white-space: nowrap;
+}
+
+.chip-species {
+  background-color: #53b3e7;
+}
+
+.chip-type {
+  background-color: #659c5d;
+}
+
+/* --- Personalizar scrollbar para que se vea un poco mas moderna ---*/
+
+.panel-scroll-area::-webkit-scrollbar {
+  width: 8px;
+}
+
+.panel-scroll-area::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 4px;
+}

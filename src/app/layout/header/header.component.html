@@ -1,0 +1,41 @@
+<span>★ MY FAVORITE CHARACTER</span>
+<div
+  class="header-favorito"
+  *ngIf="_characterFavoriteStateService.favoriteCharacter$ | async as favorito ; else sinFavorito"
+>
+
+  <div
+    class="primary-section"
+    style="cursor: pointer;"
+    (click)="toggleCharacterextraInfo()"
+  >
+    <img
+      class="character-img"
+      [src]="favorito.image"
+      [alt]="favorito.name"
+      width="50"
+      height="50"
+    >
+
+    <div class="character-block">
+      <h2 class="character-name">{{favorito.name}}</h2>
+    </div>
+  </div>
+
+  <div
+    class="info-section"
+    [ngStyle]="showCharacterExtraInfo ? {'visibility': 'visible'} : {'visibility': 'hidden'}"
+  >
+    <p><strong>Origin: </strong> {{favorito.origin.name}} </p>
+    <p><strong>Gender: </strong> {{favorito.gender}} </p>
+    <p><strong>Especies: </strong> {{favorito.species}} </p>
+  </div>
+
+</div>
+
+
+<ng-template #sinFavorito>
+  <div style="padding-left: 10px;">
+    <h2>No favorite character yet.</h2>.
+  </div>
+</ng-template>

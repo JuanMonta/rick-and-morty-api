@@ -1,0 +1,29 @@
+<div class="footer-contenedor">
+
+  <div
+    *ngIf="_characterFooterFacade.isLoadingTotals$ |async"
+    class="loading-message"
+  >
+    <span>⏳ Calculando totales... </span>
+  </div>
+
+  <div
+    *ngIf="(_characterFooterFacade.totals$ |async) as totals"
+    class="footer-main"
+  >
+    <app-totals-footer
+      title="Total of species"
+      [chipData]="totals.totalOfSpecies"
+    ></app-totals-footer>
+
+    <div class="dividor"></div>
+
+    <app-totals-footer
+      title="Total of types"
+      [chipData]="totals.totalOfTypes"
+    ></app-totals-footer>
+
+    <div class="dividor"></div>
+
+  </div>
+</div>
