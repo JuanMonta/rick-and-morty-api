@@ -25,3 +25,27 @@
   background-color: #f5f0f0;
   border-top: 2px solid #ddd;
 }
+
+/* --- RESPONSIVE DESIGN --- */
+@media (max-width: 768px) {
+
+  /* Quitamos el bloqueo del scroll y permitimos que la página crezca */
+  .pantalla-completa {
+    height: auto;
+    min-height: 100vh;
+    overflow-y: auto;
+    /* Para que el celular pueda scrollear */
+  }
+
+  .contenedor-central {
+    height: auto;
+    min-height: 70vh;
+  }
+
+  .contenedor-bottom {
+    height: auto;
+    min-height: 20vh;
+    padding-bottom: 20px;
+    /* Un poco de espacio al final de página */
+  }
+}
