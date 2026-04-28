@@ -55,7 +55,11 @@ export class CharacterDetailsFacade {
   ) { }
 
   setSelectedCharacter(character: CharacterModel | null) {
-    this.selectedCharacter.next(character);
+    if (character) {
+      if (!(character.id == this.selectedCharacter.value?.id)) {
+        this.selectedCharacter.next(character);
+      }
+    }
   }
 
 
