@@ -15,7 +15,7 @@
     <tbody>
       <tr
         *ngFor="let char of characters"
-        (click)="toggleFavoriteCharacter(char)"
+        (click)="setSelectedCharacter(char)"
       >
         <!--  stopPropagation evita que el evento tambien se propague por toda la fila
            y no solo en esta celda donde ocurre la accion.
