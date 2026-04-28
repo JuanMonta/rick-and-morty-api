@@ -50,3 +50,25 @@
   min-width: 0;
   height: 100%;
 }
+
+/* --- RESPONSIVE DESIGN --- */
+@media (max-width: 768px) {
+
+  /* Pasamos de fila (row) a columna (column) */
+  .character-view-container {
+    flex-direction: column;
+    height: auto;
+    /* Permitimos que el contenedor crezca hacia abajo */
+  }
+
+  /* Forzamos a que ambas columnas tomen el 100% del ancho */
+  .column-left,
+  .column-rigth {
+    flex: none;
+    /* Quitamos el flex: 1 original */
+    width: 100%;
+    height: auto;
+    min-height: 60vh;
+    /* Para que la tabla y los detalles tengan buen espacio vertical */
+  }
+}

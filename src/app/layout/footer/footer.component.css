@@ -17,7 +17,7 @@
   display: flex;
   height: 100%;
   width: 100%;
-  /* Espacion entre paneles*/
+  /* Espacio entre paneles*/
   gap: 10px;
   /* Obliga a que ambos tengan la misma altura */
   align-items: stretch;
@@ -27,4 +27,21 @@
 .dividor {
   width: 3px;
   height: 100%;
+}
+
+/* --- RESPONSIVE DESIGN --- */
+@media (max-width: 768px) {
+
+  /* Apilamos las tarjetas de totales de Especies y Tipos */
+  .footer-main {
+    flex-direction: column;
+    height: auto;
+    gap: 15px;
+    /* Damos un respiro entre las tarjetas */
+  }
+
+  /* Ocultamos la línea vertical ya que ahora están apilados */
+  .dividor {
+    display: none;
+  }
 }
