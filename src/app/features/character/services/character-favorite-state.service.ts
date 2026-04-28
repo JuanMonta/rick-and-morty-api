@@ -26,6 +26,7 @@ export class CharacterFavoriteStateService {
 
       if (characterModel.id == this.favoriteCharacterSubject.value?.id) {
         localStorage.removeItem(this.localFavoriteCharacterTag);
+        characterModel = null;
       } else {
         localStorage.setItem(this.localFavoriteCharacterTag, JSON.stringify(characterModel));
       }
