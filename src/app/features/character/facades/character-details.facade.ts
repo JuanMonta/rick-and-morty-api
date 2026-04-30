@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { forkJoin, Observable, of } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { BehaviorSubject } from 'rxjs';
 import { CharacterModel } from 'src/app/features/character/models/character-model';
 import { EpisodeModel } from 'src/app/features/character/models/episode-model';
@@ -25,15 +25,18 @@ interface FullCharacterDetails {
   providedIn: 'root'
 })
 export class CharacterDetailsFacade {
-  private selectedCharacter = new BehaviorSubject<CharacterModel | null>(null);
-  selecterCharacter$ = this.selectedCharacter.asObservable();
+  private selectedCharacterSubject = new BehaviorSubject<CharacterModel | null>(null);
+  selecterCharacter$: Observable<CharacterModel | null> = this.selectedCharacterSubject.asObservable();
 
+  private isLoadingSubject = new BehaviorSubject<boolean>(false);
+  isLoading$: Observable<boolean> = this.isLoadingSubject.asObservable();
 
-  readonly fullCharacterDetails$ = this.selectedCharacter.pipe(
+  readonly fullCharacterDetails$ = this.selectedCharacterSubject.pipe(
+    tap(() => this.isLoadingSubject.next(true)),
+
     switchMap((char) => {
       if (!char) return of(null);
-
-      // Aquí disparamos la carga simultánea que pide la prueba
+      // Aquí disparamos la carga simultánea
       return forkJoin({
         origen: this.getOriginData(char),
         location: this.getLocationData(char),
@@ -48,16 +51,19 @@ export class CharacterDetailsFacade {
           }
           return fullData;
         }));
-    })
+    }),
+
+    tap(() => this.isLoadingSubject.next(false))
   );
+
   constructor(
     private readonly _characterService: CharacterService
   ) { }
 
   setSelectedCharacter(character: CharacterModel | null) {
     if (character) {
-      if (!(character.id == this.selectedCharacter.value?.id)) {
-        this.selectedCharacter.next(character);
+      if (!(character.id == this.selectedCharacterSubject.value?.id)) {
+        this.selectedCharacterSubject.next(character);
       }
     }
   }

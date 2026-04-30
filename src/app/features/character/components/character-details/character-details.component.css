@@ -58,3 +58,36 @@
   color: #525050;
   text-align: center;
 }
+
+/* Estilos del loading */
+.loading-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  /* Ocupa el 100% del contenedor detalles */
+  height: 100%;
+  gap: 20px;
+}
+
+.loading-image {
+  /* Ocupará el 25% del ancho del contenedor padre */
+  width: 25%;
+  /* Mantiene la proporción original de la imagen*/
+  height: auto;
+
+  /* Límites para que no se vea muy pequeño en pantallas móviles */
+  min-width: 80px;
+  max-width: 150px;
+}
+
+.loading-text {
+  color: #666;
+  font-size: 1rem;
+  text-align: center;
+  font-style: italic;
+  margin: 0;
+  /* Para evitar que el texto toque los bordes en móviles */
+  padding: 0 15px;
+}

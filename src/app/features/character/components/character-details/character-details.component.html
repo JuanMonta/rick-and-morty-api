@@ -1,18 +1,35 @@
 <div class="contenedor-detalles">
   <ng-container *ngIf="{
+    isLoading : _characterDetailsFacade.isLoading$ | async,
     characterFullDetails : _characterDetailsFacade.fullCharacterDetails$ | async
   } as vm">
 
     <div
-      *ngIf="vm.characterFullDetails as details ; else sinSeleccion"
-      class="character-tarjeta"
+      class="loading-wrapper"
+      *ngIf="vm.isLoading"
     >
+      <img
+        src="assets/loading-hourglass.svg"
+        alt="Cargando..."
+        class="loading-image"
+      />
+      <p class="loading-text">Buscando en dimensiones alternativas...</p>
+    </div>
+
+
+    <div
+      class="character-tarjeta"
+      *ngIf="!vm.isLoading && vm.characterFullDetails as details ; else sinSeleccion"
+    >
+
+
 
       <div class="tarjeta-header">
         <img
           [src]="details.character.image"
           [alt]="details.character.name"
           class="character-image"
+          loading="lazy"
         >
         <h2>{{ details.character.name }}</h2>
       </div>
@@ -37,7 +54,9 @@
         </p>
       </div>
 
+
     </div>
+
 
     <ng-template #sinSeleccion>
       <div class="noSelected">
