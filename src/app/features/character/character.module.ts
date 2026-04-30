@@ -5,6 +5,7 @@ import { CharacterDetailsComponent } from './components/character-details/charac
 import { CharacterTableComponent } from './components/character-table/character-table.component';
 import { CharacterListComponent } from './pages/character-list/character-list.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { SharedModule } from "src/app/shared/shared.module";
 
 const characterRoutes: Routes = [
   {
@@ -22,7 +23,8 @@ const characterRoutes: Routes = [
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    RouterModule.forChild(characterRoutes)
+    RouterModule.forChild(characterRoutes),
+    SharedModule
   ]
 })
 export class CharacterModule { }

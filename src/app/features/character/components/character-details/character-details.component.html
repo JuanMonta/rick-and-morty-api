@@ -22,15 +22,12 @@
       *ngIf="!vm.isLoading && vm.characterFullDetails as details ; else sinSeleccion"
     >
 
-
-
       <div class="tarjeta-header">
-        <img
-          [src]="details.character.image"
-          [alt]="details.character.name"
-          class="character-image"
-          loading="lazy"
-        >
+        <app-avatar
+          [imageUrl]="details.character.image"
+          [characterName]="details.character.name"
+          size="150px"
+        ></app-avatar>
         <h2>{{ details.character.name }}</h2>
       </div>
 

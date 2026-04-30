@@ -1,0 +1,44 @@
+:host {
+  display: inline-block;
+}
+
+.avatar-container {
+  position: relative;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: #f1f1f1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Circulo con las iniciales del nombre del personaje */
+.initials-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #ff9a44 0%, #ff6a00 100%);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+  /* Se puede ajustar dependiendo del 'size' */
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  /* Transición suave de las iniciales del nombre hacia la imagen y para que no "parpadee" */
+  transition: opacity 0.22s ease-in;
+}
+
+img.visible {
+  opacity: 1;
+}

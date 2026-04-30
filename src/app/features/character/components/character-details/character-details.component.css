@@ -23,12 +23,6 @@
   margin-bottom: 20px;
 }
 
-.character-image {
-  width: 150px;
-  height: 150px;
-  object-fit: cover;
-  margin-bottom: 10px;
-}
 
 .tarjeta-header h2 {
   margin: 0;

@@ -1,16 +1,20 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TotalsFooterComponent } from './components/totals/totals-footer.component';
+import { AvatarComponent } from './components/avatar/avatar.component';
+
 
 @NgModule({
   declarations: [
-    TotalsFooterComponent
+    TotalsFooterComponent,
+    AvatarComponent
   ],
   imports: [
     CommonModule
   ],
   exports: [
-    TotalsFooterComponent // <--- ¡ESTE CABLE FALTABA! Ahora los demás módulos pueden usarlo.
+    TotalsFooterComponent,
+    AvatarComponent
   ]
 })
 export class SharedModule { }
