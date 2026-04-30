@@ -32,13 +32,11 @@
         </td>
         <td>
           <span>
-            <img
-              [src]="char.image"
-              [alt]="char.name"
-              width="40"
-              height="40"
-              loading="lazy"
-            >
+            <app-avatar
+              [imageUrl]="char.image"
+              [characterName]="char.name"
+              size="40px"
+            ></app-avatar>
           </span>
         </td>
         <td>{{ char.name }}</td>

@@ -1,0 +1,23 @@
+<div
+  class="avatar-container"
+  [style.width]="size"
+  [style.height]="size"
+>
+
+  <div
+    class="initials-placeholder"
+    *ngIf="!isImageLoaded || hasError"
+  >
+    {{ characterNameInitials }}
+  </div>
+
+  <img
+    *ngIf="imageUrl && !hasError"
+    [src]="imageUrl"
+    [alt]="characterName"
+    (load)="onImageLoad()"
+    (error)="onImageLoadError()"
+    [class.visible]="isImageLoaded"
+    loading="lazy"
+  >
+</div>
