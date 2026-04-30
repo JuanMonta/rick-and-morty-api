@@ -13,10 +13,9 @@ export class CharacterTableComponent implements OnInit {
   @Input() characters: CharacterModel[] = [];
 
 
-
   constructor(
     readonly _characterFavoriteStateService: CharacterFavoriteStateService,
-    private readonly _characterDetailsFacade: CharacterDetailsFacade
+    readonly _characterDetailsFacade: CharacterDetailsFacade
   ) { }
 
   ngOnInit(): void {
