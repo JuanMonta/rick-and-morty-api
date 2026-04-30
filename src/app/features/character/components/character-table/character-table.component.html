@@ -16,6 +16,7 @@
       <tr
         *ngFor="let char of characters"
         (click)="setSelectedCharacter(char)"
+        [class.selected]="char.id === (_characterDetailsFacade.selecterCharacter$ | async )?.id "
       >
         <!--  stopPropagation evita que el evento tambien se propague por toda la fila
            y no solo en esta celda donde ocurre la accion.

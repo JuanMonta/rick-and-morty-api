@@ -39,3 +39,36 @@ td {
   padding: 8px;
   border-bottom: 1px solid #eee;
 }
+
+/*----PARA LAS FILAS DE LA TABLA EFECTO CEBRA -----*/
+
+/* Filas impares blancas por defecto) */
+tbody tr {
+  background-color: #ffffff;
+  /* Suavizar el cambio de color */
+  transition: background-color 0.2s ease;
+}
+
+/* Para las filas pares un gris muy claro */
+tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Mouse Hover con un gris suave, solo se aplica si la fila NO está seleccionada con un personaje */
+tbody tr:not(.selected):hover {
+  background-color: #f1f1f1;
+  cursor: pointer;
+}
+
+/* Para la fila de personaje seleccionado un color fijo y prioritario */
+tbody tr.selected {
+  background-color: #e7f1ff !important;
+  /* Un pequeño borde lateral para resaltar */
+  border-left: 4px solid #0d6efd;
+}
+
+/* Aseguramos que el texto de la fila seleccionada se vea bien */
+tbody tr.selected td {
+  font-weight: 500;
+  color: #084298;
+}
