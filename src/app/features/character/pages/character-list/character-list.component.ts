@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Subject, combineLatest } from 'rxjs';
-import { debounceTime, distinctUntilChanged, startWith } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, filter, map, startWith } from 'rxjs/operators';
 import { CharacterListFacade } from '../../facades/character-list.facade';
 
 @Component({
@@ -37,7 +37,11 @@ export class CharacterListComponent implements OnInit, OnDestroy {
     const filterName = this.searchByName.valueChanges.pipe(
       startWith(''),
       debounceTime(500),
+      //eliminar los espacios vacios al principio y final de una palabra
+      map(value => (value || '').trim()),
       distinctUntilChanged(),
+      // dejamos pasar el valor si está vacío o si tiene 3+ letras
+      filter(value => value.length === 0 || value.length >= 3)
     );
 
     const filterStatus = this.searchByStatus.valueChanges.pipe(
@@ -45,6 +49,7 @@ export class CharacterListComponent implements OnInit, OnDestroy {
       distinctUntilChanged(),
     );
 
+    // combineLatest siempre usará el último valor que logró pasar los filtros arriba
     combineLatest([filterName, filterStatus]).subscribe(([name, status]) => {
       this._characterListFacade.loadCharacters(1, name, status);
     });
