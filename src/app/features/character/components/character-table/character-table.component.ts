@@ -11,7 +11,7 @@ import { CharacterDetailsFacade } from '../../facades/character-details.facade';
 export class CharacterTableComponent implements OnInit {
 
   @Input() characters: CharacterModel[] = [];
-
+  @Input() isLoading: boolean = false;
 
   constructor(
     readonly _characterFavoriteStateService: CharacterFavoriteStateService,

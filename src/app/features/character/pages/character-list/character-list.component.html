@@ -27,11 +27,14 @@
     <ng-container *ngIf="{
         listCharacters: (_characterListFacade.listCharacter$ | async) ?? [],
         currentPage: (_characterListFacade.currentPage$ | async) ?? 1,
-        isLoadingInformation: _characterListFacade.isLoadingInformation$ | async,
+        isLoadingInformation: (_characterListFacade.isLoadingInformation$ | async) ?? false,
         totalPages: (_characterListFacade.totalPages$ | async) ?? 1
       } as pagination">
 
-      <app-character-table [characters]="pagination.listCharacters"></app-character-table>
+      <app-character-table
+        [characters]="pagination.listCharacters"
+        [isLoading]="pagination.isLoadingInformation"
+      ></app-character-table>
 
       <div class="paginacion-container">
         <app-pagination

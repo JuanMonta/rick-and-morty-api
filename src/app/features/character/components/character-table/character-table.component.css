@@ -4,6 +4,8 @@
   flex: 1;
   min-height: 0;
   width: 100%;
+  /* Convertir este componente en el ancla del Overlay Spinner */
+  position: relative;
 }
 
 .contenedor-tabla {
