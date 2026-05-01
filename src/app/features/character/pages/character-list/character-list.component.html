@@ -26,36 +26,19 @@
 
     <ng-container *ngIf="{
         listCharacters: (_characterListFacade.listCharacter$ | async) ?? [],
-        currentPage: _characterListFacade.currentPage$ | async,
+        currentPage: (_characterListFacade.currentPage$ | async) ?? 1,
         isLoadingInformation: _characterListFacade.isLoadingInformation$ | async,
-        totalPages: _characterListFacade.totalPages$ | async
+        totalPages: (_characterListFacade.totalPages$ | async) ?? 1
       } as pagination">
 
       <app-character-table [characters]="pagination.listCharacters"></app-character-table>
 
       <div class="paginacion-container">
-        <button
-          (click)="previewPage()"
-          [disabled]="
-            pagination.currentPage === 1 || pagination.isLoadingInformation === true
-          "
-        >
-          Anterior
-        </button>
-
-        <span>
-          Página {{ pagination.currentPage }} de {{ pagination.totalPages }}
-        </span>
-
-        <button
-          (click)="nextPage()"
-          [disabled]="
-            pagination.currentPage === pagination.totalPages ||
-            pagination.isLoadingInformation === true
-          "
-        >
-          Siguiente
-        </button>
+        <app-pagination
+          [currentPage]="pagination.currentPage"
+          [totalPages]="pagination.totalPages"
+          (pageChange)="onPageChange($event)"
+        ></app-pagination>
       </div>
     </ng-container>
 

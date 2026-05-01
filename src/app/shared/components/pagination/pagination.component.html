@@ -1,0 +1,44 @@
+<div
+  class="pagination-container"
+  *ngIf="totalPages > 1"
+>
+  <div class="pagination-wrapper">
+
+    <button
+      class="page-button nav-button"
+      (click)="onPrevious()"
+      [disabled]="currentPage === 1"
+    >
+      Anterior
+    </button>
+
+    <ng-container *ngFor="let page of pagesRange">
+
+      <button
+        *ngIf="page !== '...'"
+        class="page-button number-button"
+        [class.active]="page === currentPage"
+        (click)="onPageClick(page)"
+      >
+        {{ page }}
+      </button>
+
+      <span
+        *ngIf="page === '...'"
+        class="pagination-ellipsis"
+      >
+        ...
+      </span>
+
+    </ng-container>
+
+    <button
+      class="page-button nav-button"
+      (click)="onNext()"
+      [disabled]="currentPage === totalPages"
+    >
+      Siguiente
+    </button>
+
+  </div>
+</div>
