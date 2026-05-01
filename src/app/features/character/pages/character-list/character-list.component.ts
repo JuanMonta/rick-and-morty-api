@@ -9,7 +9,7 @@ import { CharacterListFacade } from '../../facades/character-list.facade';
   templateUrl: './character-list.component.html',
   styleUrls: ['./character-list.component.css'],
 })
-export class CharacterListComponent implements OnInit {
+export class CharacterListComponent implements OnInit, OnDestroy {
   private destroySuscription = new Subject<void>();
 
   searchByName = new FormControl('');
@@ -25,17 +25,11 @@ export class CharacterListComponent implements OnInit {
     this._characterListFacade.loadCharacters(1, "", "");
   }
 
-  nextPage() {
-    this._characterListFacade.nextPage(
+  onPageChange(page: number): void {
+    this._characterListFacade.loadCharacters(
+      page,
       this.searchByName.value,
-      this.searchByStatus.value,
-    );
-  }
-
-  previewPage() {
-    this._characterListFacade.previewPage(
-      this.searchByName.value,
-      this.searchByStatus.value,
+      this.searchByStatus.value
     );
   }
 
@@ -55,9 +49,6 @@ export class CharacterListComponent implements OnInit {
       this._characterListFacade.loadCharacters(1, name, status);
     });
   }
-
-
-
 
   ngOnDestroy() {
     this.destroySuscription.next(); // Cortar todas las suscripciones al instante

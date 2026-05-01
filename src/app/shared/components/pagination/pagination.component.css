@@ -1,0 +1,72 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: flex-end;
+  padding: 15px 0;
+  width: 100%;
+}
+
+.pagination-wrapper {
+  display: flex;
+  align-items: center;
+  /* Espacio entre botones */
+  gap: 5px;
+}
+
+/* Base de los botones (Cuadrados, estilo enterprise) */
+.page-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #ddd;
+  background-color: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #333;
+  transition: all 0.2s ease;
+  padding: 8px 12px;
+  min-width: 38px;
+  /* Asegura forma cuadrada para números */
+  height: 38px;
+  border-radius: 4px;
+  /* Un pequeño borde redondeado estilo Bootstrap/Java */
+}
+
+.page-button:hover:not([disabled]):not(.active) {
+  background-color: #f5f5f5;
+  border-color: #ccc;
+}
+
+/* Botones de Navegación (Anterior/Siguiente son más anchos) */
+.nav-button {
+  font-weight: 500;
+  min-width: 80px;
+}
+
+/* Estado Deshabilitado */
+.page-button[disabled] {
+  cursor: not-allowed;
+  opacity: 0.6;
+  background-color: #e9ecef;
+}
+
+/* ESTADO ACTIVO (El azulito de Java) */
+.page-button.active {
+  background-color: #007bff;
+  /* Azul Enterprise */
+  color: white;
+  border-color: #007bff;
+  font-weight: bold;
+  cursor: default;
+}
+
+/* Estilo para las elipsis '...' */
+.pagination-ellipsis {
+  padding: 0 8px;
+  color: #666;
+  font-weight: bold;
+}
