@@ -1,55 +1,70 @@
-# Rick and Morty API Explorer - Angular SPA
+# Rick and Morty API Explorer - Enterprise Architecture
 
-Una Single Page Application (SPA) robusta desarrollada en **Angular 12**, diseñada para consumir y presentar datos de la API pública de Rick and Morty. .
+Una Single Page Application (SPA) de alto rendimiento desarrollada en **Angular 12**, diseñada bajo principios de **Clean Architecture** y **Programación Reactiva Avanzada**.
 
-## ✨ Características Principales y Arquitectura
+## 🏗️ Arquitectura y Patrones de Diseño
 
-* **Gestión de Estado Centralizada:** Usando `BehaviorSubject` de RxJS para la comunicación entre componentes hermanos (Lista, Header y Detalles) sin depender de `@Input()` o `@Output()` (evitando el *prop drilling*).
+El proyecto ha sido refactorizado para garantizar escalabilidad y mantenibilidad mediante:
 
-* **Programación Reactiva Avanzada (RxJS):** * Implementación de **Formularios Reactivos** acoplados a observables (`debounceTime`, `distinctUntilChanged`, `switchMap`) para búsquedas en tiempo real optimizadas, evitando la saturación del servidor.
-  * Uso de `forkJoin` y `switchMap` para orquestar peticiones HTTP anidadas y paralelas (extrayendo datos complejos de Origen, Localización y Episodios).
+* **Patrón Facade:** Centralización de la lógica de negocio y gestión de estado en capas de abstracción (`Facades`), desacoplando totalmente los componentes de los servicios de datos.
+* **Componentización Smart & Dumb:** 
+  * **Smart Components (Containers):** Manejan el flujo de datos y se comunican con los Facades.
+  * **Dumb Components (Presentational):** Componentes 100% reutilizables en la carpeta `Shared` (ej. `Pagination`, `Avatar`) que reciben datos vía `@Input` y emiten eventos vía `@Output`.
+* **Gestión de Estado Reactiva:** Uso de `BehaviorSubject` y flujos asíncronos para una sincronización en tiempo real entre componentes hermanos.
 
-* **Carga Progresiva y Control de Concurrencia:** Implementación de `concatMap`, `bufferCount` y `scan` para descargar toda la base de datos de forma progresiva por lotes, protegiendo la API de errores `429 Too Many Requests`.
+## 🚀 Optimizaciones con RxJS
 
-* **Caché Inteligente (TTL):** Sistema de almacenamiento en `localStorage` con caducidad de 24 horas para operaciones matemáticas pesadas (cálculo de totales globales de la base de datos de la API), reduciendo las peticiones de red a 0 en recargas posteriores.
+Se implementaron flujos complejos para maximizar el rendimiento y la experiencia de usuario:
 
-* **Diseño UI/UX Inmutable:** Maquetación construida 100% con CSS Flexbox y Grid. La pantalla se mantiene anclada (sin scroll global), permitiendo desplazamientos independientes en tablas de datos y paneles.
+* **Cancelación de Peticiones:** Uso de `switchMap` en los detalles de personajes para abortar peticiones HTTP pendientes cuando el usuario cambia de selección rápidamente.
+* **Carga Paralela Eficiente:** Implementación de `forkJoin` para disparar peticiones simultáneas (Origen, Localización, Episodios) reduciendo el tiempo de carga total.
+* **Búsqueda Optimizada:** Estrategia de filtrado mediante `debounceTime`, `distinctUntilChanged` y validación de longitud mínima (3 caracteres) para minimizar el tráfico de red.
+* **Manejo de Errores Resiliente:** Uso de `catchError` con respuestas por defecto para evitar que la UI se rompa ante fallos de la API externa.
+
+## ✨ Características de UX/UI (Grado Empresarial)
+
+* **Dynamic Pagination:** Sistema matemático de paginación con elipsis (`...`) y rangos dinámicos.
+* **Image Fallback System:** Componente `Avatar` personalizado que detecta errores de carga y muestra iniciales del personaje con un diseño estilizado.
+* **Performance Loading:** Overlays semi-transparentes con **Spinners de CSS puro** (High Performance) y *Lazy Loading* nativo para imágenes.
+* **Feedback Visual:** Filas de tabla con efecto *Zebra* y resaltado persistente de selección.
 
 ## 🛠️ Stack Tecnológico
 
-* **Framework:** Angular 12
-* **Librerías:** RxJS
-* **Estilos:** CSS3 puro (Flexbox, CSS Grid)
-* **Fuente de Datos:** [The Rick and Morty REST API](https://rickandmortyapi.com/)
+* **Framework:** Angular 12 (Core, Forms, Common).
+* **Reactividad:** RxJS 6+.
+* **Estilos:** CSS3 (Flexbox y CSS Grid para layouts inmutables).
+* **Git:** Estándar de *Conventional Commits* para un historial de versiones profesional.
 
-## 🚀 Instalación y Ejecución Local
+## 🚀 Instalación y Ejecución
 
-Para ejecutar este proyecto en tu entorno local, sigue estos pasos:
+1.  Clone el repositorio: `git clone https://github.com/JuanMonta/rick-and-morty-api.git`
+2.  Instale dependencias: `npm install`
+3.  Inicie el servidor: `ng serve`
 
-1. Clona este repositorio:
+## ⚠️ Troubleshooting: Error de Compatibilidad con Node.js
+Este proyecto está construido de forma estable en `Angular 12`. Sin embargo, si tu máquina local cuenta con una versión reciente de `Node.js (v17 o superior)`, es probable que al ejecutar ng serve te encuentres con el error `ERR_OSSL_EVP_UNSUPPORTED`.
+
+**Contexto Técnico:** Las versiones de Node.js 17+ utilizan OpenSSL 3.0, el cual introdujo restricciones criptográficas más estrictas que entran en conflicto con las dependencias de empaquetado de Angular 12 (Webpack 4).
+
+**Solución Rápida:**
+Debes indicar a Node.js que permita el uso de proveedores legacy (antiguos) de `OpenSSL`. Esto se logra seteando una variable de entorno temporal en tu terminal antes de correr el servidor. Utiliza el comando correspondiente a tu terminal:
+
+* **En Windows (Powershell)**
 ```bash
-git clone https://github.com/JuanMonta/rick-and-morty-api.git
-```
-2. Navega al directorio del proyecto.
-
-```bash
-cd rick-and-morty-api
-```
-
-3. Instala las dependencias necesarias:
-```bash
-npm install
-```
-
-4. Levanta el servidor de desarrollo:
-```bash
+$env:NODE_OPTIONS="--openssl-legacy-provider"
 ng serve
 ```
 
-5. Abre el navegador y visita `http://localhost:4200` que por lo general es la dirección con el puerto por defecto, si por alguna razón no estas seguro, héchale un vistazo a la terminal cuando levantes el servidor con `ng serve`
-
+* **En Windows (CMD Clásico)**
 ```bash
-http://localhost:4200
+set NODE_OPTIONS=--openssl-legacy-provider
+ng serve
 ```
-##
-##  👤 Autor: Juan Monta
+
+* **En Mac / Linux (Bash o Zsh)**
+```bash
+export NODE_OPTIONS=--openssl-legacy-provider
+ng serve
+```
+
+**Nota:** Esta configuración es temporal por sesión de terminal. Si cierras el editor o reinicias la PC, deberás volver a ejecutar el comando la próxima vez que desees levantar el proyecto.
