@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
+import { catchError, map, retry, switchMap, tap } from 'rxjs/operators';
 import { CharacterModel } from 'src/app/features/character/models/character-model';
 import { CharacterService } from '../services/character.service';
 
@@ -35,11 +35,9 @@ export class CharacterListFacade {
   private allDiscoveredCharacters = new BehaviorSubject<Map<number, CharacterModel>>(new Map());
   allDiscoveredCharacters$ = this.allDiscoveredCharacters.asObservable();
 
-  private fetchTrigger = new BehaviorSubject<FetchTrigger>({
-    page: 1,
-    characterName: '',
-    characterStatus: ''
-  });
+  // Usando subject en lugar de BehaviorSubject porque el subject no dispara un valor
+  // hasta que se lo indiquemos, por otro lado behavior necesita tener que disparar un valor inicial
+  private fetchTrigger = new Subject<FetchTrigger>();
 
   constructor(private readonly _characterService: CharacterService) {
     this.initFetchTrigger();
@@ -70,12 +68,17 @@ export class CharacterListFacade {
 
   private initFetchTrigger() {
     this.fetchTrigger.pipe(
+      tap(() => this.isLoadingInformationSubject.next(true)),
       switchMap((filtros) => {
-        this.isLoadingInformationSubject.next(true);
 
         return this._characterService.getCharactersByFilters(filtros.page, filtros.characterName, filtros.characterStatus)
           .pipe(
-            map((resp) => {
+            // Factor de resiliencia, aquí decimos que si por algún error de red
+            // u otro, que intente de nuevo la peticion http una ves mas (1)
+            retry(1),
+            // usamos tap en lugar de map para mutar la respuesta, ya que
+            // map se usa exclusivamente para transformar datos y retornarlos
+            tap((resp) => {
               this.managerLoadCharactersRespoponse(
                 resp.results,
                 resp.info.pages,
@@ -83,8 +86,9 @@ export class CharacterListFacade {
               );
             }),
             catchError((err) => {
+              // Valores por defecto ante un error
               this.managerLoadCharactersRespoponse([], 1, 1);
-              return of([])
+              return of([]) // Retornamos un array vacío para que el stream principal no muera
             })
           );
       })
