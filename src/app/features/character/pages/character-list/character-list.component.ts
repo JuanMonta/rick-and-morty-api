@@ -22,7 +22,6 @@ export class CharacterListComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.filtros();
-    this._characterListFacade.loadCharacters(1, "", "");
   }
 
   onPageChange(page: number): void {
@@ -35,8 +34,8 @@ export class CharacterListComponent implements OnInit, OnDestroy {
 
   private filtros() {
     const filterName = this.searchByName.valueChanges.pipe(
-      startWith(''),
       debounceTime(500),
+      startWith(''),
       //eliminar los espacios vacios al principio y final de una palabra
       map(value => (value || '').trim()),
       distinctUntilChanged(),
