@@ -1,18 +1,12 @@
+import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
-import { RouterModule, Routes } from '@angular/router';
+import { ReactiveFormsModule } from '@angular/forms';
+import { SharedModule } from "src/app/shared/shared.module";
+import { CharacterRoutingModule } from './character-routing.module';
 import { CharacterDetailsComponent } from './components/character-details/character-details.component';
 import { CharacterTableComponent } from './components/character-table/character-table.component';
 import { CharacterListComponent } from './pages/character-list/character-list.component';
-import { ReactiveFormsModule } from '@angular/forms';
-import { SharedModule } from "src/app/shared/shared.module";
 
-const characterRoutes: Routes = [
-  {
-    path: '',
-    component: CharacterListComponent
-  }
-];
 
 @NgModule({
   declarations: [
@@ -23,8 +17,8 @@ const characterRoutes: Routes = [
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    RouterModule.forChild(characterRoutes),
-    SharedModule
+    SharedModule,
+    CharacterRoutingModule
   ]
 })
 export class CharacterModule { }
