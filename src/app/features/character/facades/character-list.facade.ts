@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
 import { catchError, map, retry, switchMap, tap } from 'rxjs/operators';
 import { CharacterModel } from 'src/app/features/character/models/character-model';
-import { CharacterService } from '../services/character.service';
+import { CharacterRestService } from '../services/character-rest.service';
 
 interface FetchTrigger {
   page: number,
@@ -39,7 +39,7 @@ export class CharacterListFacade {
   // hasta que se lo indiquemos, por otro lado behavior necesita tener que disparar un valor inicial
   private fetchTrigger = new Subject<FetchTrigger>();
 
-  constructor(private readonly _characterService: CharacterService) {
+  constructor(private readonly _characterService: CharacterRestService) {
     this.initFetchTrigger();
     this.loadDiscoveredCharacters();
   }

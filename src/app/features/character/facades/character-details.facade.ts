@@ -5,7 +5,7 @@ import { BehaviorSubject } from 'rxjs';
 import { CharacterModel } from 'src/app/features/character/models/character-model';
 import { EpisodeModel } from 'src/app/features/character/models/episode-model';
 import { LocationModel } from 'src/app/features/character/models/location-model';
-import { CharacterService } from '../services/character.service';
+import { CharacterRestService } from '../services/character-rest.service';
 
 interface BasicInfo {
   name: string,
@@ -57,7 +57,7 @@ export class CharacterDetailsFacade {
   );
 
   constructor(
-    private readonly _characterService: CharacterService
+    private readonly _characterService: CharacterRestService
   ) { }
 
   setSelectedCharacter(character: CharacterModel | null) {
