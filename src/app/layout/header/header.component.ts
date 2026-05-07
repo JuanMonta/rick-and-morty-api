@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ApiConfigService } from 'src/app/core/services/api-config.service';
 import { CharacterFavoriteStateService } from 'src/app/features/character/services/character-favorite-state.service';
 
 @Component({
@@ -8,7 +9,10 @@ import { CharacterFavoriteStateService } from 'src/app/features/character/servic
 })
 export class HeaderComponent implements OnInit {
 
-  constructor(readonly _characterFavoriteStateService: CharacterFavoriteStateService) { }
+  constructor(
+    readonly _characterFavoriteStateService: CharacterFavoriteStateService,
+    readonly apiConfig: ApiConfigService
+  ) { }
 
   showCharacterExtraInfo: boolean = false;
 

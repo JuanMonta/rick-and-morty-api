@@ -1,37 +1,70 @@
-<span>★ MY FAVORITE CHARACTER</span>
-<div
-  class="header-favorito"
-  *ngIf="_characterFavoriteStateService.favoriteCharacter$ | async as favorito ; else sinFavorito"
->
+<header class="main-header">
+  <section class="favorito-section">
 
-  <div
-    class="primary-section"
-    style="cursor: pointer;"
-    (click)="toggleCharacterextraInfo()"
-  >
-    <img
-      class="character-img"
-      [src]="favorito.image"
-      [alt]="favorito.name"
-      width="50"
-      height="50"
+    <span class="section-title">★ MY FAVORITE CHARACTER</span>
+    <div
+      class="header-favorito"
+      *ngIf="_characterFavoriteStateService.favoriteCharacter$ | async as favorito ; else sinFavorito"
     >
 
-    <div class="character-block">
-      <h2 class="character-name">{{favorito.name}}</h2>
+      <div
+        class="primary-section"
+        style="cursor: pointer;"
+        (click)="toggleCharacterextraInfo()"
+      >
+        <img
+          class="character-img"
+          [src]="favorito.image"
+          [alt]="favorito.name"
+          width="50"
+          height="50"
+        >
+
+        <div class="character-block">
+          <h2 class="character-name">{{favorito.name}}</h2>
+        </div>
+      </div>
+
+      <div
+        class="info-section"
+        [ngStyle]="showCharacterExtraInfo ? {'visibility': 'visible'} : {'visibility': 'hidden'}"
+      >
+        <p><strong>Origin: </strong> {{favorito.origin.name}} </p>
+        <p><strong>Gender: </strong> {{favorito.gender}} </p>
+        <p><strong>Especies: </strong> {{favorito.species}} </p>
+      </div>
     </div>
-  </div>
 
-  <div
-    class="info-section"
-    [ngStyle]="showCharacterExtraInfo ? {'visibility': 'visible'} : {'visibility': 'hidden'}"
-  >
-    <p><strong>Origin: </strong> {{favorito.origin.name}} </p>
-    <p><strong>Gender: </strong> {{favorito.gender}} </p>
-    <p><strong>Especies: </strong> {{favorito.species}} </p>
-  </div>
+  </section>
 
-</div>
+  <section class="api-config-section">
+    <div class="api-toggle-wrapper">
+      <span
+        class="mode-label"
+        [class.active]="apiConfig.currentMode === 'REST'"
+      >REST</span>
+
+      <button
+        class="toggle-track"
+        (click)="apiConfig.toggleApiMode()"
+        title="Cambiar fuente de datos"
+      >
+        <div
+          class="toggle-thumb"
+          [class.graphql-mode]="apiConfig.currentMode === 'GRAPHQL'"
+        ></div>
+      </button>
+
+      <span
+        class="mode-label"
+        [class.active]="apiConfig.currentMode === 'GRAPHQL'"
+      >GraphQL</span>
+    </div>
+  </section>
+
+</header>
+
+
 
 
 <ng-template #sinFavorito>
