@@ -1,15 +1,16 @@
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http'
 import { Observable } from 'rxjs';
-import { environment } from 'src/environments/environment';
 import { CharacterModel } from 'src/app/features/character/models/character-model';
-import { CharacterPaginationModel } from 'src/app/features/character/models/character-pagination-model';
+import { environment } from 'src/environments/environment';
+import { ICharacterService } from './character-service.interface';
+import { CharacterPaginationModel } from '../models/character-pagination-model';
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class CharacterService {
+export class CharacterRestService implements ICharacterService {
 
   private readonly apiCharacterUrl = environment.apiUrl + environment.endpoints.character;
 
