@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CharacterFooterFacade } from 'src/app/features/character/facades/character-footer.facade';
+import { CharacterFooterFacade } from 'src/app/layout/facades/character-footer.facade';
 
 @Component({
   selector: 'app-footer',
