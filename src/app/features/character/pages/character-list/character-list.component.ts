@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Subject, combineLatest } from 'rxjs';
 import { debounceTime, distinctUntilChanged, filter, map, startWith } from 'rxjs/operators';
-import { CharacterListFacade } from '../../facades/character-list.facade';
+import { CharacterListFacade } from '../facades/character-list.facade';
 
 @Component({
   selector: 'app-character-list',

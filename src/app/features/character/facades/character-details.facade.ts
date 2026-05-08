@@ -76,7 +76,7 @@ export class CharacterDetailsFacade {
    * pero de diferente nombre en su respectivo endpoint
    * @param char Personaje seleccionado
    */
-  private getOriginData(char: CharacterModel) {
+  private getOriginData(char: CharacterModel): Observable<BasicInfo> {
     //---- Para el origen necesitamos armar, el nombre
     // y el nombre de un personaje que comparte ese origen ----
 
@@ -87,14 +87,14 @@ export class CharacterDetailsFacade {
 
       //si existe el origen, el origen es un LocationModel,
       //consultamos qué personajes tiene existen en esa Location
-      this._characterService.getDataByUrl<LocationModel>(char.origin.url).pipe(
+      this._characterService.getCharacterLocationByUrl(char.origin.url).pipe(
         switchMap(location => {
           //Los residentes son de tipo CharacterModel
           return location.residents.length > 0 ?
             //si tenemos personajes en esa location, entonces porfin tenemos
             // un nombre de personaje(s) que vive(n) en un origin,
             // y podremos completar nuestro Observable<BasicInfo>
-            this._characterService.getDataByUrl<CharacterModel>(location.residents[0]).pipe(
+            this._characterService.getCharacterByUrl(location.residents[0]).pipe(
               map(resChar => {
                 const basic: BasicInfo = {
                   name: location.name,
@@ -134,7 +134,7 @@ export class CharacterDetailsFacade {
    * @param char Personaje seleccionado
    * @returns Observable<BasicInfo>
    */
-  private getLocationData(char: CharacterModel) {
+  private getLocationData(char: CharacterModel): Observable<BasicInfo> {
     // Teniendo el personaje seleccionado, partimos a anidar las peticiones.
     // La location devuelve un LocationModel
     const location: Observable<BasicInfo> = char.location.url ?
@@ -142,12 +142,12 @@ export class CharacterDetailsFacade {
       // si el personaje tiene una location, entonces podemos usar la LocationModel
       // que devuelve la consulta de location, dentro de LocationModel tambien
       // llegan las url de los personajes
-      this._characterService.getDataByUrl<LocationModel>(char.location.url).pipe(
+      this._characterService.getCharacterLocationByUrl(char.location.url).pipe(
         //verificamos que haya personajes
         switchMap(loc => loc.residents.length > 0 ?
           // si hay personajes, entonces ya tenemos nuestros datos para Observable<BasicInfo>,
           // que seria tener el nombre de la location y el nombre del residente de esa location;
-          this._characterService.getDataByUrl<CharacterModel>(loc.residents[0]).pipe(
+          this._characterService.getCharacterByUrl(loc.residents[0]).pipe(
             map(resident => {
               const basic: BasicInfo = {
                 name: loc.name,
@@ -171,22 +171,23 @@ export class CharacterDetailsFacade {
     return location;
   }
 
-  private getEpisodeData(char: CharacterModel) {
+  private getEpisodeData(char: CharacterModel): Observable<never[] | EpisodeModel[]> {
     const blankEpisode = of([]);
 
     let episodesUrls: Array<string> = [];
     if (!char.episode || char.episode.length === 0) {
       return blankEpisode;
     } else {
-
-      if (char.episode.length >= 3) {
-        episodesUrls = char.episode.slice(0, 3);
-      } else {
-        episodesUrls = char.episode;
-      }
+      /*
+            if (char.episode.length >= 3) {
+              episodesUrls = char.episode.slice(0, 3);
+            } else {
+              episodesUrls = char.episode;
+            } */
+      episodesUrls = [char.episode[0]];
     }
 
-    const episodesPetitionHttp = episodesUrls.map(url => this._characterService.getDataByUrl<EpisodeModel>(url));
+    const episodesPetitionHttp: Observable<EpisodeModel>[] = episodesUrls.map(url => this._characterService.getEpisodeByUrl(url));
     return forkJoin(episodesPetitionHttp).pipe(
       catchError(() => {
         return blankEpisode;

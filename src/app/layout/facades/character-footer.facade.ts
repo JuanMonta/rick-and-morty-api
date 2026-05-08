@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { CHARACTER_PROGRESIVE_LOADING_CONSTS, CharacterProgresiveLoadingModel, CharacterProgresiveLoadingTotalsModel } from '../../../shared/models/progresive-loading.model';
+import { CHARACTER_PROGRESIVE_LOADING_CONSTS, CharacterProgresiveLoadingModel, CharacterProgresiveLoadingTotalsModel } from '../../shared/models/progresive-loading.model';
 import { map } from 'rxjs/operators';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { CharacterListFacade } from './character-list.facade';
+import { CharacterListFacade } from '../../features/character/pages/facades/character-list.facade';
 
 interface Totals {
   totalOfSpecies: CharacterProgresiveLoadingTotalsModel[],
