@@ -4,6 +4,11 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { CharacterPaginationModel } from '../models/character-pagination-model';
 import { ICharacterService } from './character-service.interface';
+import { CharacterModel } from '../models/character-model';
+
+interface GetCharactersResponse {
+  characters: CharacterPaginationModel
+}
 
 const GET_CHARACTERS = gql`
   query GetCharacters($page: Int, $name: String, $status: String) {
@@ -37,14 +42,57 @@ const GET_CHARACTERS = gql`
   }
 `;
 
+interface GetSingleCharacterResponse {
+  character: CharacterModel
+}
+
+const GET_SINGLE_CHARACTER = gql`
+  query GetSingleCharacter($characterId: ID!){
+    character(id: $characterId){
+        id,
+        name,
+        status,
+        species,
+        type,
+        gender,
+        origin{
+            name,
+            url
+        }
+        location{
+          name,
+          url
+        }
+        image,
+        episode
+    }
+  }
+`;
+
 @Injectable({
   providedIn: 'root'
 })
 export class CharacterGraphqlService implements ICharacterService {
 
   constructor(private apollo: Apollo) { }
+
+  getDataByUrl<T>(url: string): Observable<T> {
+    throw new Error('Method not implemented.');
+  }
+
+  getSingleCharacter(characterId: number | string): Observable<CharacterModel> {
+    return this.apollo.watchQuery<GetSingleCharacterResponse>({
+      query: GET_SINGLE_CHARACTER,
+      variables: {
+        id: characterId
+      }
+    }).valueChanges.pipe(
+      map(response => response.data.character)
+    );
+  }
+
   getCharactersByFilters(pageNumber: number, characterName: string, characterStatus: string): Observable<CharacterPaginationModel> {
-    return this.apollo.watchQuery<any>({
+    return this.apollo.watchQuery<GetCharactersResponse>({
       query: GET_CHARACTERS,
       variables: {
         page: pageNumber,
@@ -52,7 +100,7 @@ export class CharacterGraphqlService implements ICharacterService {
         status: characterStatus
       }
     }).valueChanges.pipe(
-      map(response => response.data.characters as CharacterPaginationModel)
+      map(response => response.data.characters)
     );;
   }
 
