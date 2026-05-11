@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { CharacterModel } from 'src/app/features/character/models/character-model';
 import { environment } from 'src/environments/environment';
-import { ICharacterService } from './character-service.interface';
+import { ICharacterService } from './character.service.interface';
 import { CharacterPaginationModel } from '../models/character-pagination-model';
 import { LocationModel } from '../models/location-model';
 import { EpisodeModel } from '../models/episode-model';
@@ -27,9 +27,9 @@ export class CharacterRestService implements ICharacterService {
       return this._http.get<T>(url);
     } */
 
-  /*   getSingleCharacter(characterId: number | string): Observable<CharacterModel> {
-      return this._http.get<CharacterModel>(this.apiCharacterUrl, { params: new HttpParams().set('id', characterId) });
-    } */
+  getSingleCharacter(characterId: number | string): Observable<CharacterModel> {
+    return this._http.get<CharacterModel>(`${this.apiEpisodeUrl}/${characterId}`);
+  }
 
   private extractIdFromUrl(url: string): string {
     if (!url) return '';

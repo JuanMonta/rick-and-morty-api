@@ -1,11 +1,8 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
 import { catchError, retry, switchMap, tap } from 'rxjs/operators';
-import { ApiConfigService } from 'src/app/core/services/api-config.service';
 import { CharacterModel } from 'src/app/features/character/models/character-model';
-import { CharacterRestService } from '../../services/character-rest.service';
-import { CharacterGraphqlService } from '../../services/character-graphql.service';
-import { ICharacterService } from '../../services/character-service.interface';
+import { CharacterService } from '../../services/character.service';
 
 interface FetchTrigger {
   page: number,
@@ -43,21 +40,12 @@ export class CharacterListFacade {
   private fetchTrigger = new Subject<FetchTrigger>();
 
   constructor(
-    private readonly _apiConfig: ApiConfigService,
-    private readonly _characterRestService: CharacterRestService,
-    private readonly _characterGraphqlService: CharacterGraphqlService
+    private readonly _characterService: CharacterService
   ) {
     this.initFetchTrigger();
     this.loadDiscoveredCharacters();
   }
 
-  private get apiMode(): ICharacterService {
-    if (this._apiConfig.currentMode == 'GRAPHQL') {
-      return this._characterGraphqlService;
-    } else {
-      return this._characterRestService;
-    }
-  }
 
   nextPage(characterName: string, characterStatus: string) {
     if (
@@ -86,7 +74,7 @@ export class CharacterListFacade {
       tap(() => this.isLoadingInformationSubject.next(true)),
       switchMap((filtros) => {
 
-        return this.apiMode.getCharactersByFilters(filtros.page, filtros.characterName, filtros.characterStatus)
+        return this._characterService.getCharactersByFilters(filtros.page, filtros.characterName, filtros.characterStatus)
           .pipe(
             // Factor de resiliencia, aquí decimos que si por algún error de red
             // u otro, que intente de nuevo la peticion http una ves mas (1)
