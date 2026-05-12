@@ -8,8 +8,10 @@ import { CharacterFooterFacade } from 'src/app/layout/facades/character-footer.f
 })
 export class FooterComponent implements OnInit {
 
+  readonly isLoadingTotals$ = this._characterFooterFacade.isLoadingTotals$;
+  readonly totals$ = this._characterFooterFacade.totals$;
 
-  constructor(readonly _characterFooterFacade: CharacterFooterFacade) { }
+  constructor(private readonly _characterFooterFacade: CharacterFooterFacade) { }
 
   ngOnInit(): void {
 
