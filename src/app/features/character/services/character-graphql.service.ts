@@ -1,23 +1,33 @@
 import { Injectable } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, take } from 'rxjs/operators';
 import { CharacterModel } from '../models/character-model';
 import { CharacterPaginationModel } from '../models/character-pagination-model';
 import { EpisodeModel } from '../models/episode-model';
 import { LocationModel } from '../models/location-model';
+import { PaginationModel } from '../models/pagination-info-model';
 import { ICharacterService } from './character.service.interface';
+import { GraphqlCharacter, GraphqlMapper, GraphqlResident } from './mapper/graphql-mapper';
 
 interface GetCharacterPaginationModelResponse {
-  characters: CharacterPaginationModel
+  characters: {
+    info: PaginationModel,
+    results: GraphqlCharacter[]
+  }
 }
 
 interface GetCharacterModelResponse {
-  character: CharacterModel
+  character: GraphqlCharacter
 }
 
 interface GetLocationModelResponse {
-  location: LocationModel
+  location: {
+    name: string,
+    type: string,
+    dimension: string,
+    residents: GraphqlResident[]
+  }
 }
 
 interface GetEpisodeModelResponse {
@@ -43,60 +53,66 @@ const GET_CHARACTERS = gql`
         image
         created
         origin {
+          id
           name
-          url
         }
         location {
+          id
           name
-          url
         }
-        episode
+        episode{
+          id
+        }
       }
     }
   }
 `;
 
 const GET_SINGLE_CHARACTER = gql`
-  query GetSingleCharacter($characterId: ID!){
-    character(id: $characterId){
-        id,
-        name,
-        status,
-        species,
-        type,
-        gender,
+  query GetSingleCharacter($id: ID!){
+    character(id: $id){
+        id
+        name
+        status
+        species
+        type
+        gender
         origin{
-            name,
-            url
+            id
+            name
         }
         location{
-          name,
-          url
+          id
+          name
         }
-        image,
-        episode
+        image
+        episode{
+          id
+        }
     }
   }
 `;
 
 const GET_CHARACTER_LOCATION = gql`
-  query GetCharacterLocation($locationId: ID!){
-    location(id: $locationId){
-      name,
-      type,
-      dimension,
-      residents
+  query GetCharacterLocation($id: ID!){
+    location(id: $id){
+      name
+      type
+      dimension
+      residents{
+        id
+      }
     }
   }
 `;
 
 const GET_CHARACTER_EPISODE = gql`
-  query GetCharacterEpisode($episodeId: ID!){
-    episode(id: $episodeId){
-      name,
-      air_date,
-      episode,
-      characters
+  query GetCharacterEpisode($id: ID!){
+    episode(id: $id){
+      id
+      name
+      air_date
+      episode
     }
   }
 `;
@@ -108,20 +124,26 @@ export class CharacterGraphqlService implements ICharacterService {
 
   constructor(private apollo: Apollo) { }
 
-  private extractIdFromUrl(url: string): string {
+  private extractIdFromUrl(url: string | number): string {
     if (!url) return '';
-    const parts = url.split('/');
-    return parts[parts.length - 1];
+    const value = url.toString().trim();
+
+    if (value.includes('/')) {
+      const parts = value.split('/').filter(p => p !== '');
+      return parts[parts.length - 1]
+    }
+    return value;
   }
 
-  getSingleCharacter(characterId: number | string): Observable<CharacterModel> {
+  getSingleCharacter(idChar: number | string): Observable<CharacterModel> {
     return this.apollo.watchQuery<GetCharacterModelResponse>({
       query: GET_SINGLE_CHARACTER,
       variables: {
-        id: characterId
+        id: this.extractIdFromUrl(idChar.toString())
       }
     }).valueChanges.pipe(
-      map(response => response.data.character)
+      take(1),
+      map(response => GraphqlMapper.toCharacterModel(response.data.character))
     );
   }
 
@@ -132,7 +154,8 @@ export class CharacterGraphqlService implements ICharacterService {
         id: this.extractIdFromUrl(locationUrl)
       }
     }).valueChanges.pipe(
-      map(response => response.data.location)
+      take(1),
+      map(response => GraphqlMapper.toLocationModel(response.data.location))
     );
   }
   getCharacterByUrl(characterUrl: string): Observable<CharacterModel> {
@@ -147,10 +170,10 @@ export class CharacterGraphqlService implements ICharacterService {
       variables: {
         id: this.extractIdFromUrl(episodeUrl)
       }
-    })
-      .valueChanges.pipe(
-        map(response => response.data.episode)
-      );
+    }).valueChanges.pipe(
+      take(1),
+      map(response => response.data.episode)
+    );
   }
 
   getCharactersByFilters(pageNumber: number, characterName: string, characterStatus: string): Observable<CharacterPaginationModel> {
@@ -162,7 +185,16 @@ export class CharacterGraphqlService implements ICharacterService {
         status: characterStatus
       }
     }).valueChanges.pipe(
-      map(response => response.data.characters)
+      take(1),
+      map(response => {
+        const paginationData = response.data.characters;
+        const results = paginationData.results.map((char: GraphqlCharacter) => GraphqlMapper.toCharacterModel(char));
+
+        return {
+          ...paginationData,
+          results: results
+        } as CharacterPaginationModel;
+      })
     );;
   }
 

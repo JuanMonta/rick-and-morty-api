@@ -23,22 +23,28 @@ export class CharacterRestService implements ICharacterService {
 
   }
 
+  private extractIdFromUrl(url: string | number): string {
+    if (!url) return '';
+    const value = url.toString().trim();
+
+    if (value.includes('/')) {
+      const parts = value.split('/').filter(p => p !== '');
+      return parts[parts.length - 1]
+    }
+    return value;
+  }
+
   /*   getDataByUrl<T>(url: string): Observable<T> {
       return this._http.get<T>(url);
     } */
 
-  getSingleCharacter(characterId: number | string): Observable<CharacterModel> {
-    return this._http.get<CharacterModel>(`${this.apiEpisodeUrl}/${characterId}`);
-  }
-
-  private extractIdFromUrl(url: string): string {
-    if (!url) return '';
-    const parts = url.split('/');
-    return parts[parts.length - 1];
-  }
-
   private fecthResources<T>(baseApiUrl: string, urlOrId: string): Observable<T> {
-    return this._http.get<T>(`${baseApiUrl}/${this.extractIdFromUrl(urlOrId)}`);
+    const id = this.extractIdFromUrl(urlOrId);
+    return this._http.get<T>(`${baseApiUrl}/${id}`);
+  }
+
+  getSingleCharacter(characterId: number | string): Observable<CharacterModel> {
+    return this.fecthResources<CharacterModel>(this.apiCharacterUrl, characterId.toString());
   }
 
   getCharacterLocationByUrl(locationUrl: string): Observable<LocationModel> {

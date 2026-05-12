@@ -1,7 +1,7 @@
-export interface EpisodeModel{
-  id : number,
-  name : string,
-  air_date : string,
-  episode : string,
-  characters : string,
+export interface EpisodeModel {
+  id: number,
+  name: string,
+  air_date: string,
+  episode: string,
+  characters: string[]
 }
