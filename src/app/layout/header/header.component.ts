@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiConfigService } from 'src/app/core/services/api-config.service';
-import { CharacterFavoriteStateService } from 'src/app/features/character/services/character-favorite-state.service';
+import { CharacterFavoriteStateFacade } from 'src/app/features/character/facades/character-favorite-state.facade';
 
 @Component({
   selector: 'app-header',
@@ -10,7 +10,7 @@ import { CharacterFavoriteStateService } from 'src/app/features/character/servic
 export class HeaderComponent implements OnInit {
 
   constructor(
-    readonly _characterFavoriteStateService: CharacterFavoriteStateService,
+    readonly _characterFavoriteStateService: CharacterFavoriteStateFacade,
     readonly apiConfig: ApiConfigService
   ) { }
 

@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CharacterModel } from 'src/app/features/character/models/character-model';
-import { CharacterFavoriteStateService } from '../../services/character-favorite-state.service';
+import { CharacterFavoriteStateFacade } from '../../facades/character-favorite-state.facade';
 import { CharacterDetailsFacade } from '../../facades/character-details.facade';
 
 @Component({
@@ -14,7 +14,7 @@ export class CharacterTableComponent implements OnInit {
   @Input() isLoading: boolean = false;
 
   constructor(
-    readonly _characterFavoriteStateService: CharacterFavoriteStateService,
+    readonly _characterFavoriteStateService: CharacterFavoriteStateFacade,
     readonly _characterDetailsFacade: CharacterDetailsFacade
   ) { }
 

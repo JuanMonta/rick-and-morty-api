@@ -1,14 +1,14 @@
 <div class="footer-contenedor">
 
   <div
-    *ngIf="_characterFooterFacade.isLoadingTotals$ |async"
+    *ngIf="isLoadingTotals$ |async"
     class="loading-message"
   >
     <span>⏳ Calculando totales... </span>
   </div>
 
   <div
-    *ngIf="(_characterFooterFacade.totals$ |async) as totals"
+    *ngIf="(totals$ |async) as totals"
     class="footer-main"
   >
     <app-totals-footer
