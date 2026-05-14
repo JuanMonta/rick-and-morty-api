@@ -5,19 +5,27 @@
   <div class="pagination-wrapper">
 
     <button
-      class="page-button nav-button"
+      mat-icon-button
       (click)="onPrevious()"
       [disabled]="currentPage === 1"
+      aria-label="Página anterior"
     >
-      Anterior
+      <mat-icon class="nav-arrow">chevron_left</mat-icon>
     </button>
 
     <ng-container *ngFor="let page of pagesRange">
+      <button
+        *ngIf="page !== '...' && page === currentPage"
+        mat-flat-button
+        class="number-button active-page"
+      >
+        {{ page }}
+      </button>
 
       <button
-        *ngIf="page !== '...'"
-        class="page-button number-button"
-        [class.active]="page === currentPage"
+        *ngIf="page !== '...' && page !== currentPage"
+        mat-button
+        class="number-button"
         (click)="onPageClick(page)"
       >
         {{ page }}
@@ -27,17 +35,18 @@
         *ngIf="page === '...'"
         class="pagination-ellipsis"
       >
-        ...
+        <mat-icon>more_horiz</mat-icon>
       </span>
 
     </ng-container>
 
     <button
-      class="page-button nav-button"
+      mat-icon-button
       (click)="onNext()"
       [disabled]="currentPage === totalPages"
+      aria-label="Página siguiente"
     >
-      Siguiente
+      <mat-icon class="nav-arrow">chevron_right</mat-icon>
     </button>
 
   </div>
