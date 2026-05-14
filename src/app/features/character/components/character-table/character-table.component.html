@@ -1,60 +1,129 @@
 <div
-  class="overlay-loading"
+  class="loading-shade"
   *ngIf="isLoading"
 >
-  <div class="css-spinner"></div>
-  <p>Cargando datos...</p>
+  <mat-spinner></mat-spinner>
 </div>
 
 <div class="contenedor-tabla">
-  <table>
-    <thead>
-      <tr>
-        <th></th>
-        <th></th>
-        <th>NAME</th>
-        <th>STATUS</th>
-        <th>SPECIES</th>
-        <th>TYPE</th>
-        <th>GENDER</th>
-        <th>CREATED</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr
-        *ngFor="let char of characters"
-        (click)="setSelectedCharacter(char)"
-        [class.selected]="char.id === (_characterDetailsFacade.selecterCharacter$ | async )?.id "
-      >
-        <!--  stopPropagation evita que el evento tambien se propague por toda la fila
-           y no solo en esta celda donde ocurre la accion.
-           Como pieda en un stanque, donde cae la piedra es el 'evento', y las olas resultantes
-           son la propagacion hacia las demas celdas de la fila.
-           -->
-        <td (click)="toggleFavoriteCharacter(char); $event.stopPropagation()">
-          <ng-container></ng-container>
-          <span [ngStyle]=" ((_characterFavoriteStateService.favoriteCharacter$ |async)?.id === char.id)
+  <table
+    mat-table
+    [dataSource]="characters"
+    class="mat-elevation-z8"
+  >
 
-                ? { opacity: '1', color: '#f19a0d', cursor: 'pointer' }
-                : { opacity: '0.2', color: 'gray', cursor: 'pointer' }
-            ">★</span>
-        </td>
-        <td>
-          <span>
-            <app-avatar
-              [imageUrl]="char.image"
-              [characterName]="char.name"
-              size="40px"
-            ></app-avatar>
-          </span>
-        </td>
-        <td>{{ char.name }}</td>
-        <td>{{ char.status }}</td>
-        <td>{{ char.species }}</td>
-        <td>{{ char.type }}</td>
-        <td>{{ char.gender }}</td>
-        <td>{{ char.created | date: "dd/MMM/y h:mm:ss a" }}</td>
-      </tr>
-    </tbody>
+    <ng-container matColumnDef="FAV">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+      ></th>
+      <td
+        mat-cell
+        *matCellDef="let char"
+        (click)="toggleFavoriteCharacter(char); $event.stopPropagation()"
+      >
+        <mat-icon [ngStyle]="((_characterFavoriteStateService.favoriteCharacter$ | async)?.id === char.id)
+            ? { color: '#f19a0d', cursor: 'pointer' }
+            : { color: 'gray', opacity: '0.4', cursor: 'pointer' }">
+          star
+        </mat-icon>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="IMG">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+      ></th>
+      <td
+        mat-cell
+        *matCellDef="let char"
+      >
+        <app-avatar
+          [imageUrl]="char.image"
+          [characterName]="char.name"
+          size="40px"
+        ></app-avatar>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="NAME">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+      > NAME </th>
+      <td
+        mat-cell
+        *matCellDef="let char"
+      > {{ char.name }} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="STATUS">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+      > STATUS </th>
+      <td
+        mat-cell
+        *matCellDef="let char"
+      > {{ char.status }} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="SPECIES">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+      > SPECIES </th>
+      <td
+        mat-cell
+        *matCellDef="let char"
+      > {{ char.species }} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="TYPE">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+      > TYPE </th>
+      <td
+        mat-cell
+        *matCellDef="let char"
+      > {{ char.type || 'N/A' }} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="GENDER">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+      > GENDER </th>
+      <td
+        mat-cell
+        *matCellDef="let char"
+      > {{ char.gender }} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="CREATED">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+      > CREATED </th>
+      <td
+        mat-cell
+        *matCellDef="let char"
+      > {{ char.created | date:'shortDate' }} </td>
+    </ng-container>
+
+    <tr
+      mat-header-row
+      *matHeaderRowDef="tableColumns; sticky: true"
+    ></tr>
+
+    <tr
+      mat-row
+      *matRowDef="let row; columns: tableColumns;"
+      (click)="setSelectedCharacter(row)"
+      [class.selected-row]="row.id === (_characterDetailsFacade.selecterCharacter$ | async)?.id"
+    >
+    </tr>
   </table>
 </div>

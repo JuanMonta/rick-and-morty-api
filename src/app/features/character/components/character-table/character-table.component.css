@@ -4,73 +4,43 @@
   flex: 1;
   min-height: 0;
   width: 100%;
-  /* Convertir este componente en el ancla del Overlay Spinner */
   position: relative;
+  /* Clave para que el spinner flote sobre esto */
 }
 
 .contenedor-tabla {
-  /* Hace que la tabla ocupe todo el espacio sobrante entre mis inputs de busqueda/filtro y la paginación */
   flex: 1;
-  /* Le dice a Flexbox que permita encoger el div y que use el scroll */
   min-height: 0;
-  /* Activa la barra de desplazamiento solo aquí en mi componente par la tabla*/
   overflow-y: auto;
-  border: 1px solid #ccc;
 }
 
 table {
   width: 100%;
-  border-collapse: collapse;
 }
 
-/* Hacer fijos los encabezados de la tabla */
-th {
-  position: sticky;
-  top: 0;
-  /* Poner un color fijo para que los ancabezados no sean transparentes
-   y evitar que las celdas se vean atras de ellos */
-  background-color: white;
-  /* Lo mantiene por encima de los datos al hacer scroll */
-  z-index: 2;
-  padding: 8px;
-  text-align: left;
-  border-bottom: 2px solid #000;
-}
-
-td {
-  padding: 8px;
-  border-bottom: 1px solid #eee;
-}
-
-/*----PARA LAS FILAS DE LA TABLA EFECTO CEBRA -----*/
-
-/* Filas impares blancas por defecto) */
-tbody tr {
-  background-color: #ffffff;
-  /* Suavizar el cambio de color */
-  transition: background-color 0.2s ease;
-}
-
-/* Para las filas pares un gris muy claro */
-tbody tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
-
-/* Mouse Hover con un gris suave, solo se aplica si la fila NO está seleccionada con un personaje */
-tbody tr:not(.selected):hover {
-  background-color: #f1f1f1;
+/* El fondo gris cuando pasamos el mouse por una fila */
+tr.mat-row:hover {
+  background-color: #f5f5f5;
   cursor: pointer;
 }
 
-/* Para la fila de personaje seleccionado un color fijo y prioritario */
-tbody tr.selected {
-  background-color: #e7f1ff !important;
-  /* Un pequeño borde lateral para resaltar */
-  border-left: 4px solid #0d6efd;
+/* El fondo destacado cuando una fila está seleccionada */
+tr.mat-row.selected-row {
+  background-color: #e3f2fd;
+  /* Azul material suave */
 }
 
-/* Aseguramos que el texto de la fila seleccionada se vea bien */
-tbody tr.selected td {
-  font-weight: 500;
-  color: #084298;
+/* Pantalla de carga semi-transparente */
+.loading-shade {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.7);
+  z-index: 10;
+  /* Para que el spinner flote encima de la tabla */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
