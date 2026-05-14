@@ -1,7 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { MatTableDataSource } from '@angular/material/table';
 import { CharacterModel } from 'src/app/features/character/models/character-model';
-import { CharacterFavoriteStateFacade } from '../../facades/character-favorite-state.facade';
 import { CharacterDetailsFacade } from '../../facades/character-details.facade';
+import { CharacterFavoriteStateFacade } from '../../facades/character-favorite-state.facade';
 
 @Component({
   selector: 'app-character-table',
@@ -10,8 +11,12 @@ import { CharacterDetailsFacade } from '../../facades/character-details.facade';
 })
 export class CharacterTableComponent implements OnInit {
 
+  materialTableDataSource = new MatTableDataSource<CharacterModel>([]);
   @Input() characters: CharacterModel[] = [];
+
   @Input() isLoading: boolean = false;
+
+  tableColumns: string[] = ['FAV', 'IMG', 'NAME', 'STATUS', 'SPECIES', 'TYPE', 'GENDER', 'CREATED'];
 
   constructor(
     readonly _characterFavoriteStateService: CharacterFavoriteStateFacade,
