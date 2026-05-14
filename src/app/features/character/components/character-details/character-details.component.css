@@ -2,86 +2,86 @@
   display: block;
   width: 100%;
   height: 100%;
+  /* Vital para que el componente tenga altura */
+
+  /* Elimina cualquier línea fantasma del host */
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 .contenedor-detalles {
   height: 100%;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
+  padding: 0 10px;
+  box-sizing: border-box;
+
+  /* Elimina cualquier línea fantasma del host */
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
-
+/* La tarjeta ahora ocupa TODO el alto */
 .character-tarjeta {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+
+  /* Eliminamos padding y forzamos cortes de las esquinas */
+  padding: 0 !important;
+  overflow: hidden;
+  border-radius: 8px;
+  /* Por si Material intenta inyectar un borde */
+  border: none !important;
+}
+
+/* Forzamos al contenido interno de la tarjeta a estirarse */
+::ng-deep .character-tarjeta .mat-card-content {
   display: flex;
   flex-direction: column;
   height: 100%;
+  margin: 0 !important;
 }
 
-.tarjeta-header {
+/* Header centrado como tu diseño original */
+.tarjeta-header-personalizado {
   text-align: center;
-  margin-bottom: 20px;
+  padding: 20px 10px;
 }
 
-
-.tarjeta-header h2 {
-  margin: 0;
+.tarjeta-header-personalizado h2 {
+  margin: 15px 0 0 0;
+  font-size: 1.5rem;
+  font-weight: 500;
 }
 
-.lista-info {
-  background: white;
-  padding: 20px;
-  /* Ocupar todo el resto del espacio hacia abajo */
+/* La lista ahora tiene su propio scroll si hay mucho texto */
+.lista-info-scroll {
+  /* Esto hace que la lista use todo el espacio restante */
   flex: 1;
-  /* Activar un scroll cuando la informacion es muy larga */
   overflow-y: auto;
+  padding: 10px;
 }
 
-.lista-info p {
-  margin: 8px 0;
-  font-size: 0.95rem;
-  padding-bottom: 8px;
+.sub-line {
+  color: #666;
+  font-size: 0.85rem;
 }
 
-.noSelected {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  color: #525050;
-  text-align: center;
-}
-
-/* Estilos del loading */
+/* Estados de carga y vacío */
+.noSelected,
 .loading-wrapper {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 100%;
-  /* Ocupa el 100% del contenedor detalles */
   height: 100%;
-  gap: 20px;
-}
-
-.loading-image {
-  /* Ocupará el 25% del ancho del contenedor padre */
-  width: 25%;
-  /* Mantiene la proporción original de la imagen*/
-  height: auto;
-
-  /* Límites para que no se vea muy pequeño en pantallas móviles */
-  min-width: 80px;
-  max-width: 150px;
-}
-
-.loading-text {
-  color: #666;
-  font-size: 1rem;
+  color: #888;
   text-align: center;
-  font-style: italic;
-  margin: 0;
-  /* Para evitar que el texto toque los bordes en móviles */
-  padding: 0 15px;
+  background-color: #fafafa;
+  border-radius: 8px;
+  border: 1px dashed #ddd;
 }
