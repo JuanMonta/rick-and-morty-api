@@ -8,56 +8,87 @@
       class="loading-wrapper"
       *ngIf="vm.isLoading"
     >
-      <div class="css-spinner"></div>
+      <mat-spinner diameter="50"></mat-spinner>
       <p class="loading-text">Buscando en dimensiones alternativas...</p>
     </div>
 
-
-    <div
-      class="character-tarjeta"
-      *ngIf="!vm.isLoading && vm.characterFullDetails as details ; else sinSeleccion"
+    <mat-card
+      class="character-tarjeta mat-elevation-z4"
+      *ngIf="!vm.isLoading && vm.characterFullDetails as details; else sinSeleccion"
     >
 
-      <div class="tarjeta-header">
-        <app-avatar
-          [imageUrl]="details.character.image"
-          [characterName]="details.character.name"
-          size="150px"
-        ></app-avatar>
-        <h2>{{ details.character.name }}</h2>
-      </div>
+      <mat-card-content class="layout-vertical">
 
-      <div class="lista-info">
-        <p><strong>Species:</strong> {{ details.character.species }}</p>
+        <div class="tarjeta-header-personalizado">
+          <app-avatar
+            [imageUrl]="details.character.image"
+            [characterName]="details.character.name"
+            size="150px"
+          ></app-avatar>
+          <h2>{{ details.character.name }}</h2>
+        </div>
 
-        <p><strong>Origin:</strong> {{ details.originInfo.name }}</p>
-        <p> -Origin Resident: {{ details.originInfo.resident }}</p>
+        <mat-divider></mat-divider>
 
-        <p><strong>Location:</strong> {{ details.locationInfo.name }}</p>
-        <p> -Location Resident: {{ details.locationInfo.resident }}</p>
+        <div class="lista-info-scroll">
+          <mat-list>
 
-        <p><strong>Aparition (Episode):</strong>
-          <ng-container *ngIf="details.episode && details.episode.length > 0; else noEpisode">
-            {{ details.episode[0]?.episode }} - {{ details.episode[0]?.name }}
-          </ng-container>
+            <mat-list-item>
+              <mat-icon mat-list-icon>fingerprint</mat-icon>
+              <div mat-line><strong>Species:</strong> {{ details.character.species }}</div>
+            </mat-list-item>
 
-          <ng-template #noEpisode>
-            <span>Unknown</span>
-          </ng-template>
-        </p>
-      </div>
+            <mat-list-item>
+              <mat-icon mat-list-icon>public</mat-icon>
+              <div mat-line><strong>Origin:</strong> {{ details.originInfo.name }}</div>
+              <div
+                mat-line
+                class="sub-line"
+              >Resident: {{ details.originInfo.resident }}</div>
+            </mat-list-item>
 
+            <mat-list-item>
+              <mat-icon mat-list-icon>place</mat-icon>
+              <div mat-line><strong>Location:</strong> {{ details.locationInfo.name }}</div>
+              <div
+                mat-line
+                class="sub-line"
+              >Resident: {{ details.locationInfo.resident }}</div>
+            </mat-list-item>
 
-    </div>
+            <mat-list-item>
+              <mat-icon mat-list-icon>movie</mat-icon>
+              <div mat-line><strong>Aparition (Episode):</strong></div>
+              <div
+                mat-line
+                class="sub-line"
+                *ngIf="details.episode && details.episode.length > 0; else noEpisode"
+              >
+                {{ details.episode[0]?.episode }} - {{ details.episode[0]?.name }}
+              </div>
+              <ng-template #noEpisode>
+                <div
+                  mat-line
+                  class="sub-line"
+                >Unknown</div>
+              </ng-template>
+            </mat-list-item>
 
+          </mat-list>
+        </div>
+      </mat-card-content>
+    </mat-card>
 
     <ng-template #sinSeleccion>
-      <div class="noSelected">
-        <h2>CHARACTER DETAILS</h2>
-        <p>Please, first select a character from the list.</p>
+      <div
+        class="noSelected"
+        *ngIf="!vm.isLoading"
+      >
+        <mat-icon style="font-size: 60px; height: 60px; width: 60px; color: #ccc;">person_search</mat-icon>
+        <h2>No Character Selected</h2>
+        <p>Click on a character in the table to view their details.</p>
       </div>
     </ng-template>
 
   </ng-container>
-
 </div>
