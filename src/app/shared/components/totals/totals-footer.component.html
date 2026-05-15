@@ -1,12 +1,21 @@
-<div class="footer-panel">
-  <div class="panel-title title-blue">{{title}}</div>
+<mat-card class="totals-card mat-elevation-z2">
 
-  <div class="panel-scroll-area">
-    <span
-      class="chip chip-species"
-      *ngFor="let totals of chipData"
-    >
-      <strong>{{ totals.name }}:</strong> {{ totals.count }}
-    </span>
+  <div
+    class="card-header"
+    [ngClass]="{'bg-blue': title.toLowerCase().includes('species'), 'bg-green': title.toLowerCase().includes('types')}"
+  >
+    {{ title }}
   </div>
-</div>
+
+  <mat-card-content class="chip-container">
+    <mat-chip-list>
+      <mat-chip
+        *ngFor="let total of chipData"
+        [ngClass]="{'chip-blue': title.toLowerCase().includes('species'), 'chip-green': title.toLowerCase().includes('types')}"
+      >
+        <span class="chip-name">{{ total.name }}:</span> &nbsp; <span class="chip-count">{{ total.count }}</span>
+      </mat-chip>
+    </mat-chip-list>
+  </mat-card-content>
+
+</mat-card>

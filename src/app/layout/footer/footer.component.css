@@ -2,14 +2,21 @@
   height: 100%;
   width: 100%;
   padding: 10px;
-
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 }
 
 .loading-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Separa el spinner del texto */
+  gap: 10px;
   color: #ff9800;
-  font-weight: bold;
-  text-align: center;
-  margin-top: 15px;
+  font-weight: 500;
+  margin-top: 5px;
+  margin-bottom: 10px;
 }
 
 /* El contenedor que contendrá dos paneles */
@@ -18,9 +25,10 @@
   height: 100%;
   width: 100%;
   /* Espacio entre paneles*/
-  gap: 10px;
+  gap: 15px;
   /* Obliga a que ambos tengan la misma altura */
   align-items: stretch;
+  min-height: 0;
 }
 
 /* Solo para agregar otra pequeña separacion entre mis dos paneles*/
@@ -36,12 +44,7 @@
   .footer-main {
     flex-direction: column;
     height: auto;
+    /* Damos un espacio entre las tarjetas */
     gap: 15px;
-    /* Damos un respiro entre las tarjetas */
-  }
-
-  /* Ocultamos la línea vertical ya que ahora están apilados */
-  .dividor {
-    display: none;
   }
 }
