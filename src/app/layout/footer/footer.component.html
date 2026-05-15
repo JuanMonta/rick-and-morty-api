@@ -4,6 +4,7 @@
     *ngIf="isLoadingTotals$ |async"
     class="loading-message"
   >
+    <mat-spinner diameter="24"></mat-spinner>
     <span>⏳ Calculando totales... </span>
   </div>
 
@@ -22,8 +23,6 @@
       title="Total of types"
       [chipData]="totals.totalOfTypes"
     ></app-totals-footer>
-
-    <div class="dividor"></div>
 
   </div>
 </div>

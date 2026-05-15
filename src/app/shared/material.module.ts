@@ -10,6 +10,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
+import { MatChipsModule } from '@angular/material/chips';
 
 const MATERIAL_COMPONENTS = [
   MatButtonModule,
@@ -23,7 +24,8 @@ const MATERIAL_COMPONENTS = [
   MatInputModule,
   MatSelectModule,
   MatListModule,
-  MatDividerModule
+  MatDividerModule,
+  MatChipsModule
 ];
 
 @NgModule({
