@@ -2,14 +2,14 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Subject, combineLatest } from 'rxjs';
 import { debounceTime, distinctUntilChanged, filter, map, startWith } from 'rxjs/operators';
-import { CharacterListFacade } from '../facades/character-list.facade';
+import { CharacterListFacade } from '../../pages/facades/character-list.facade';
 
 @Component({
-  selector: 'app-character-list',
-  templateUrl: './character-list.component.html',
-  styleUrls: ['./character-list.component.css'],
+  selector: 'app-character-page',
+  templateUrl: './character-page.component.html',
+  styleUrls: ['./character-page.component.css'],
 })
-export class CharacterListComponent implements OnInit, OnDestroy {
+export class CharacterPageComponent implements OnInit, OnDestroy {
   private destroySuscription = new Subject<void>();
 
   searchByName = new FormControl('');

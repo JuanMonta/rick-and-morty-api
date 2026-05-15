@@ -3,14 +3,14 @@ import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { SharedModule } from "src/app/shared/shared.module";
 import { CharacterRoutingModule } from './character-routing.module';
-import { CharacterDetailsComponent } from './components/character-details/character-details.component';
+import { CharacterDetailsComponent } from './containers/character-details/character-details.component';
 import { CharacterTableComponent } from './components/character-table/character-table.component';
-import { CharacterListComponent } from './pages/character-list/character-list.component';
+import { CharacterPageComponent } from './containers/character-page/character-page.component';
 
 
 @NgModule({
   declarations: [
-    CharacterListComponent,
+    CharacterPageComponent,
     CharacterTableComponent,
     CharacterDetailsComponent
   ],

@@ -7,11 +7,11 @@ interface ChipInfo {
 }
 
 @Component({
-  selector: 'app-totals-footer',
-  templateUrl: './totals-footer.component.html',
-  styleUrls: ['./totals-footer.component.css']
+  selector: 'app-totals-card',
+  templateUrl: './totals-card.component.html',
+  styleUrls: ['./totals-card.component.css']
 })
-export class TotalsFooterComponent implements OnInit {
+export class TotalsCardComponent implements OnInit {
   @Input() title: string = "";
 
   @Input() chipData: CharacterProgresiveLoadingTotalsModel[] = [];

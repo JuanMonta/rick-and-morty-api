@@ -12,17 +12,17 @@
     *ngIf="(totals$ |async) as totals"
     class="footer-main"
   >
-    <app-totals-footer
+    <app-totals-card
       title="Total of species"
       [chipData]="totals.totalOfSpecies"
-    ></app-totals-footer>
+    ></app-totals-card>
 
     <div class="dividor"></div>
 
-    <app-totals-footer
+    <app-totals-card
       title="Total of types"
       [chipData]="totals.totalOfTypes"
-    ></app-totals-footer>
+    ></app-totals-card>
 
   </div>
 </div>
