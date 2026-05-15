@@ -9,12 +9,12 @@
 
   <mat-card-content class="chip-container">
     <mat-chip-list>
-      <mat-chip
+      <app-chip
         *ngFor="let total of chipData"
-        [ngClass]="{'chip-blue': title.toLowerCase().includes('species'), 'chip-green': title.toLowerCase().includes('types')}"
+        [color]="title.toLowerCase().includes('species') ? '#0a5377' : '#2e7d32'"
+        [text]="total.name + ':'+ total.count"
       >
-        <span class="chip-name">{{ total.name }}:</span> &nbsp; <span class="chip-count">{{ total.count }}</span>
-      </mat-chip>
+      </app-chip>
     </mat-chip-list>
   </mat-card-content>
 

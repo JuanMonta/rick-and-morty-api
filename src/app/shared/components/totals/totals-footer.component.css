@@ -40,37 +40,3 @@
   padding: 15px !important;
   margin: 0 !important;
 }
-
-/* --- COLORES PERSONALIZADOS PARA LOS CHIPS --- */
-/* Usamos ::ng-deep para sobrescribir el fondo por defecto gris de Angular Material */
-::ng-deep .mat-chip.chip-blue {
-  background-color: #0a5377 !important;
-  color: white !important;
-}
-
-::ng-deep .mat-chip.chip-green {
-  background-color: #2e7d32 !important;
-  color: white !important;
-}
-
-/* --- TIPOGRAFÍA Y LEGIBILIDAD --- */
-::ng-deep .mat-chip {
-  font-size: 0.85rem !important;
-  /* Forzamos letra delgada */
-  font-weight: 400 !important;
-  /* Suaviza los bordes del texto blanco en pantallas modernas */
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  /* Opcional: Hacer los chips ligeramente más compactos */
-  min-height: 28px !important;
-}
-
-/* Resaltamos levemente el nombre (ej. Human) sin llegar a la negrita pesada */
-.chip-name {
-  font-weight: 500;
-  opacity: 0.95;
-}
-
-.chip-count {
-  font-weight: 400;
-}

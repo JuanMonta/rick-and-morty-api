@@ -1,0 +1,21 @@
+.custom-shared-chip {
+  color: white !important;
+  font-size: 0.85rem !important;
+  font-weight: 400 !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 28px !important;
+  border-radius: 15px !important;
+}
+
+.chip-label {
+  font-weight: 500;
+  opacity: 0.95;
+  /* Pequeño truco UI para mejor lectura */
+  letter-spacing: 0.3px;
+}
+
+.static-chip {
+  cursor: default !important;
+  pointer-events: none !important;
+}
