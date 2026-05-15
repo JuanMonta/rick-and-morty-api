@@ -12,13 +12,12 @@
         style="cursor: pointer;"
         (click)="toggleCharacterextraInfo()"
       >
-        <img
-          class="character-img"
-          [src]="favorito.image"
-          [alt]="favorito.name"
-          width="50"
-          height="50"
-        >
+        <app-avatar
+          [imageUrl]="favorito.image"
+          [characterName]="favorito.name"
+          size="50px"
+          [isCircular]="false"
+        ></app-avatar>
 
         <div class="character-block">
           <h2 class="character-name">{{favorito.name}}</h2>
