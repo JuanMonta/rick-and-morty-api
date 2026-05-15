@@ -1,0 +1,9 @@
+<mat-chip
+  class="custom-shared-chip"
+  [style.background-color]="color"
+  [selectable]="isInteractive"
+  [disableRipple]="isInteractive"
+  [ngClass]="{'static-chip': !isInteractive}"
+>
+  <span class="chip-label">{{ text }}</span>
+</mat-chip>
