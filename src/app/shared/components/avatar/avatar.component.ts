@@ -10,6 +10,8 @@ export class AvatarComponent implements OnInit {
   @Input() imageUrl: string = '';
   @Input() characterName: string = '';
   @Input() size: string = '40px';
+  @Input() isCircular: boolean = false;
+  @Input() borderRadius: string = "5px";
 
   isImageLoaded = false;
   hasError = false;
