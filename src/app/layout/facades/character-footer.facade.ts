@@ -1,13 +1,11 @@
 import { Injectable } from '@angular/core';
-import { CHARACTER_PROGRESIVE_LOADING_CONSTS, CharacterProgresiveLoadingModel, CharacterProgresiveLoadingTotalsModel } from '../../shared/models/progresive-loading.model';
-import { map } from 'rxjs/operators';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { CharacterListFacade } from '../../features/character/pages/facades/character-list.facade';
+import { CHARACTER_PROGRESIVE_LOADING_CONSTS, CharacterProgresiveLoadingTotalsModel } from '../../shared/models/progresive-loading.model';
+import { AtributeTotal } from 'src/app/core/models/api.model';
 
-interface Totals {
-  totalOfSpecies: CharacterProgresiveLoadingTotalsModel[],
-  totalOfTypes: CharacterProgresiveLoadingTotalsModel[]
-}
+
 
 @Injectable({
   providedIn: 'root'
@@ -18,38 +16,12 @@ export class CharacterFooterFacade {
   constructor(
     private readonly _characterListFacade: CharacterListFacade
   ) { }
-  private isLoadingTotalsSubject = new BehaviorSubject<boolean>(false);
-  isLoadingTotals$ = this.isLoadingTotalsSubject.asObservable();
 
-  readonly totals$: Observable<Totals> = this._characterListFacade.allDiscoveredCharacters$.pipe(
-    map(characterMap => {
+  public readonly isLoading$: Observable<boolean> = this._characterListFacade.isLoadingInformation$;
 
-      const conteoSpecies: Record<string, number> = {};
-      const conteoTypes: Record<string, number> = {};
-      characterMap.forEach((c) => {
-        const specie = c.species || CHARACTER_PROGRESIVE_LOADING_CONSTS.UNKNOWN;
-        const type = c.type || CHARACTER_PROGRESIVE_LOADING_CONSTS.NONE;
+  public readonly speciesTotals$: Observable<AtributeTotal[]> = this._characterListFacade.speciesTotals$;
+  public readonly typeTotals$: Observable<AtributeTotal[]> = this._characterListFacade.typeTotals$;
 
-        conteoSpecies[specie] = (conteoSpecies[specie] || 0) + 1;
-        conteoTypes[type] = (conteoTypes[type] || 0) + 1;
-      });
 
-      return {
-        totalOfSpecies: Object.keys(conteoSpecies).map(k => {
-          return {
-            name: k,
-            count: conteoSpecies[k]
-          }
-        }
-        ),
-        totalOfTypes: Object.keys(conteoTypes).map(k => {
-          return {
-            name: k,
-            count: conteoTypes[k]
-          }
-        })
-      }
-    })
-  );
 
 }

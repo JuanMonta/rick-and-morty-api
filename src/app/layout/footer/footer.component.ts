@@ -1,4 +1,6 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
+import { AtributeTotal } from 'src/app/core/models/api.model';
 import { CharacterFooterFacade } from 'src/app/layout/facades/character-footer.facade';
 
 @Component({
@@ -8,8 +10,11 @@ import { CharacterFooterFacade } from 'src/app/layout/facades/character-footer.f
 })
 export class FooterComponent implements OnInit {
 
-  readonly isLoadingTotals$ = this._characterFooterFacade.isLoadingTotals$;
-  readonly totals$ = this._characterFooterFacade.totals$;
+  readonly isLoadingTotals$: Observable<boolean> = this._characterFooterFacade.isLoading$;
+
+  public readonly speciesTotals$: Observable<AtributeTotal[]> = this._characterFooterFacade.speciesTotals$;
+
+  public readonly typeTotals$: Observable<AtributeTotal[]> = this._characterFooterFacade.typeTotals$;
 
   constructor(private readonly _characterFooterFacade: CharacterFooterFacade) { }
 

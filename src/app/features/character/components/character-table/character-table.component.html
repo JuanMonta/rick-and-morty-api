@@ -123,7 +123,7 @@
       mat-row
       *matRowDef="let row; columns: tableColumns;"
       (click)="setSelectedCharacter(row)"
-      [class.selected-row]="row.id === (_characterDetailsFacade.selecterCharacter$ | async)?.id"
+      [class.selected-row]="row.id === (_characterDetailsFacade.currentCharacter$ | async)?.id"
     >
     </tr>
   </table>

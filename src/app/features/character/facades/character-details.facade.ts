@@ -1,142 +1,114 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, forkJoin, Observable, of } from 'rxjs';
-import { catchError, defaultIfEmpty, finalize, map, shareReplay, switchMap, tap } from 'rxjs/operators';
-import { CharacterModel } from 'src/app/features/character/models/character-model';
-import { EpisodeModel } from 'src/app/features/character/models/episode-model';
+import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { CharacterService } from '../services/character.service';
+import { AtributeTotal, Character } from 'src/app/core/models/api.model';
+import { createBaseCharacter } from 'src/app/core/adapters/api.adapter';
+import { CharacterListFacade } from '../pages/facades/character-list.facade';
 
-interface BasicInfo {
+interface LoadCharactersTrigger {
   name: string,
-  resident: string
+  status: string,
+  page: string | number
 }
-
-interface FullCharacterDetails {
-  character: CharacterModel,
-  originInfo: BasicInfo,
-  locationInfo: BasicInfo,
-  episode: EpisodeModel[]
-}
-
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class CharacterDetailsFacade {
-  private selectedCharacterSubject = new BehaviorSubject<CharacterModel | null>(null);
-  selecterCharacter$: Observable<CharacterModel | null> = this.selectedCharacterSubject.asObservable();
-
-  private isLoadingSubject = new BehaviorSubject<boolean>(false);
-  isLoading$: Observable<boolean> = this.isLoadingSubject.asObservable();
-
-  readonly fullCharacterDetails$ = this.selectedCharacterSubject.pipe(
-    // Usamos un timeout para que angunal no se vuelva inquieto al cambiar el estado de la vista
-    // miestras ésta aún se renderiza.
-
-    switchMap((char) => {
-      if (!char) {
-        tap(() => setTimeout(() => this.isLoadingSubject.next(false), 0));
-        return of(null)
-      };
-
-      setTimeout(() => this.isLoadingSubject.next(true), 0);
-
-      // Preparamos el observable del origen y lo guardamos en caché con shareReplay(1)
-      const originReq$ = this.fetchLocationAndResident(char.origin.name, char.origin.url).pipe(
-        shareReplay(1)
-      );
-
-      // Si la URL de Origin y Location son idénticas NO hacemos otra petición,
-      // reutilizamos la que ya está en camino (originReq$).
-      const isSameLocation = char.origin.url == char.location.url && char.origin.url !== '';
-      const locationRequest$ = isSameLocation ?
-        originReq$
-        : this.fetchLocationAndResident(char.location.name, char.location.url)
-
-      // Aquí disparamos la carga simultánea
-      return forkJoin({
-        origen: originReq$,
-        location: locationRequest$,
-        episodio: this.getEpisodeData(char)
-      }).pipe(
-        map(fork => {
-          const fullData: FullCharacterDetails = {
-            character: char,
-            originInfo: fork.origen,
-            locationInfo: fork.location,
-            episode: fork.episodio
-          }
-          return fullData;
-        }),
-        finalize(() => setTimeout(() => this.isLoadingSubject.next(false), 0))
-      );
-    }),
-
-  );
 
   constructor(
-    private readonly _characterService: CharacterService
-  ) { }
-
-  setSelectedCharacter(character: CharacterModel | null) {
-    if (character) {
-      if (!(character.id == this.selectedCharacterSubject.value?.id)) {
-        this.selectedCharacterSubject.next(character);
-      }
-    }
+    private readonly _characterService: CharacterService,
+    private readonly _characterListFacade: CharacterListFacade
+  ) {
+    this.initLoadCharactersTrigger();
   }
 
-  private fetchLocationAndResident(fallbackName: string, url: string): Observable<BasicInfo> {
+  private readonly isLoadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  public readonly isLoading$: Observable<boolean> = this.isLoadingSubject.asObservable();
 
-    if (!url) return of(this.createBasicInfo(fallbackName, 'None'));
+  //========CONSULTA DE PERSONAJES UNO POR UNO==========================================================================
+  private readonly characterStateSubject: BehaviorSubject<Character | null> = new BehaviorSubject<Character | null>(null);
+  public readonly currentCharacter$: Observable<Character | null> = this.characterStateSubject.asObservable();
 
-    return this._characterService.getCharacterLocationByUrl(url).pipe(
-      switchMap(loc => {
-        if (loc.residents && loc.residents.length > 0) {
-          return this._characterService.getSingleCharacter(loc.residents[0]).pipe(
+  //========CONTEO DE ESPECIES =========================================================================================
+  private readonly allCharactersSubject: BehaviorSubject<Character[]> = this._characterListFacade.allCharactersSubject;
 
-            map(resident => (this.createBasicInfo(loc.name, resident.name))),
-            catchError(() => of(this.createBasicInfo(loc.name, 'Unknown')))
-          );
-        }
-        return of({ name: loc.name, resident: 'None' });
+  //========PARA PAGINACION=========================================================================================
+  private readonly paginationCharactersSubject: BehaviorSubject<Character[]> = new BehaviorSubject<Character[]>([]);
+  public readonly paginationCharacters$: Observable<Character[]> = this.paginationCharactersSubject.asObservable();
+
+  private currentPageSubject = new BehaviorSubject<number>(1);
+  currentPage$: Observable<number> = this.currentPageSubject.asObservable();
+
+  private totalPagesSubject = new BehaviorSubject<number>(1);
+  totalPages$: Observable<number> = this.totalPagesSubject.asObservable();
+
+  private loadCharactersTrigger: Subject<LoadCharactersTrigger> = new Subject<LoadCharactersTrigger>();
+
+  /**
+   * Configura la escucha reactiva que se encarga de cancelar peticiones repetidas.
+   */
+  private initLoadCharactersTrigger(): void {
+    this.loadCharactersTrigger.pipe(
+      tap(() => {
+        this.isLoadingSubject.next(true);
       }),
-      catchError(() => of(this.createBasicInfo(fallbackName, 'Error')))
-    );
-  }
-
-  private createBasicInfo(name: string, resident: string): BasicInfo {
-    const basicInf: BasicInfo = {
-      name: name,
-      resident: resident
-    }
-    return basicInf;
-  }
-
-  private getEpisodeData(char: CharacterModel): Observable<never[] | EpisodeModel[]> {
-    const blankEpisode = of<EpisodeModel[]>([]);
-
-    let episodesUrls: Array<string> = [];
-    if (!char.episode || char.episode.length === 0) {
-      return blankEpisode;
-    } else {
-      /*
-            if (char.episode.length >= 3) {
-              episodesUrls = char.episode.slice(0, 3);
-            } else {
-              episodesUrls = char.episode;
-            } */
-      episodesUrls = [char.episode[0]];
-    }
-
-    const episodesPetitionHttp: Observable<EpisodeModel>[] = episodesUrls.map(url => this._characterService.getEpisodeByUrl(url));
-
-    return forkJoin(episodesPetitionHttp).pipe(
-      defaultIfEmpty([] as EpisodeModel[]),
-      catchError(() => {
-        return blankEpisode;
+      //Si entra un nuevo objeto con parámetros antes de que
+      // la petición anterior termine, switchMap mata la petición HTTP anterior en la red.
+      switchMap(params => {
+        // Guardamos la página actual de forma síncrona preventiva
+        this.currentPageSubject.next(Number(params.page));
+        // Retornamos la consulta al repositorio para que switchMap la controle
+        return this._characterService.getCharacters(params.page, params.name, params.status).pipe(
+          // ¡ESCUDO! Si esta petición específica falla, todo fallará para siempre hasta que se cargue la página,
+          // por ello retornamos un objeto vacío y el flujo principal (loadCharactersTrigger) NO muere.
+          catchError(error => {
+            this.isLoadingSubject.next(false);
+            console.error('[RAM Audit] Fallo al cargar personajes:', error);
+            return of({ info: null, results: [] })
+          })
+        );
       })
-    );
+    ).subscribe(response => {
+      this.isLoadingSubject.next(false);
+
+      this.totalPagesSubject.next((response.info?.pages) ?? 1);
+
+      const incomingCharacters = response.results;
+      this.paginationCharactersSubject.next(incomingCharacters);
+
+      let currentCharacters = this.allCharactersSubject.getValue();
+      // Filtramos los nuevos personajes dejando pasar solo aquellos cuyo ID NO exista en la lista histórica
+      const uniqueCharacters = incomingCharacters.filter(incomingChar =>
+        !currentCharacters.some(existingChar => existingChar.id == incomingChar.id)
+      )
+      this.allCharactersSubject.next([...currentCharacters, ...uniqueCharacters]);
+      console.log(
+        `[RAM Audit] Histórico previo: ${currentCharacters.length} | Nuevos detectados: ${incomingCharacters.length} | Insertados únicos: ${uniqueCharacters.length}`
+      );
+      console.log('[Contenido Total RAM]', this.allCharactersSubject.getValue());
+    });
+  }
+
+  //================================================================================================
+  loadCharacters(name: string, status: string, page: string | number): void {
+    this.loadCharactersTrigger.next({ name: name, status: status, page: page });
+  }
+
+  loadCharacter(id: string | number) {
+    this.isLoadingSubject.next(true);
+    this._characterService.getCharacterById(id).subscribe({
+      next: (character: Character) => {
+        this.characterStateSubject.next(character);
+        this.isLoadingSubject.next(false);
+      },
+      error: (error) => {
+        //console.error('Error al cargar el personaje:', error);
+        this.isLoadingSubject.next(false);
+      }
+    });
   }
 
 
