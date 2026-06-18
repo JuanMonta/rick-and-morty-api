@@ -3,7 +3,7 @@ import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { createBaseCharacter } from 'src/app/core/adapters/api.adapter';
 import { AtributeTotal, Character } from 'src/app/core/models/api.model';
-import { CharacterService } from '../../services/character.service';
+import { CharacterRepositoryProxyService } from '../../services/character-repository-proxy.service';
 
 interface LoadCharactersTrigger {
   name: string,
@@ -17,7 +17,7 @@ interface LoadCharactersTrigger {
 export class CharacterListFacade {
 
   constructor(
-    private readonly _characterService: CharacterService,
+    private readonly _characterService: CharacterRepositoryProxyService,
   ) {
     this.initLoadCharactersTrigger();
   }

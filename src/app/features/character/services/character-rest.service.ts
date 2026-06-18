@@ -4,14 +4,13 @@ import { forkJoin, Observable, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { characterRestDtoToCharacter } from 'src/app/core/adapters/api.adapter';
 import { Character, CharacterPaginatedRestDTO, CharacterRestDTO, EpisodeRestDTO, LocationRestDTO, PaginatedCharacters } from 'src/app/core/models/api.model';
+import { CharacterRepository } from 'src/app/core/services/character-repository.abstract';
 import { environment } from 'src/environments/environment';
-import { ICharacterService } from './character.service.interface';
-
 
 @Injectable({
   providedIn: 'root'
 })
-export class CharacterRestService implements ICharacterService {
+export class CharacterRestService implements CharacterRepository {
 
   private readonly apiCharacterUrl = environment.apiUrl + environment.endpoints.character;
   private readonly apiLocationUrl = environment.apiUrl + environment.endpoints.location;

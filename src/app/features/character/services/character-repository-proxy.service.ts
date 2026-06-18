@@ -4,12 +4,12 @@ import { Character, PaginatedCharacters } from 'src/app/core/models/api.model';
 import { ApiConfigService } from 'src/app/core/services/api-config.service';
 import { CharacterGraphqlService } from './character-graphql.service';
 import { CharacterRestService } from './character-rest.service';
-import { ICharacterService } from './character.service.interface';
+import { CharacterRepository } from 'src/app/core/services/character-repository.abstract';
 
 @Injectable({
   providedIn: 'root'
 })
-export class CharacterService implements ICharacterService {
+export class CharacterRepositoryProxyService implements CharacterRepository {
 
   constructor(
     private readonly _apiConfig: ApiConfigService,
@@ -17,7 +17,7 @@ export class CharacterService implements ICharacterService {
     private readonly _characterGraphqlService: CharacterGraphqlService
   ) { }
 
-  private get apiMode(): ICharacterService {
+  private get apiMode(): CharacterRepository {
     if (this._apiConfig.currentMode == 'GRAPHQL') {
       return this._characterGraphqlService;
     } else {

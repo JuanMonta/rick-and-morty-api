@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
-import { catchError, map, switchMap, tap } from 'rxjs/operators';
-import { CharacterService } from '../services/character.service';
-import { AtributeTotal, Character } from 'src/app/core/models/api.model';
-import { createBaseCharacter } from 'src/app/core/adapters/api.adapter';
+import { catchError, switchMap, tap } from 'rxjs/operators';
+import { Character } from 'src/app/core/models/api.model';
 import { CharacterListFacade } from '../pages/facades/character-list.facade';
+import { CharacterRepositoryProxyService } from '../services/character-repository-proxy.service';
 
 interface LoadCharactersTrigger {
   name: string,
@@ -19,7 +18,7 @@ interface LoadCharactersTrigger {
 export class CharacterDetailsFacade {
 
   constructor(
-    private readonly _characterService: CharacterService,
+    private readonly _characterService: CharacterRepositoryProxyService,
     private readonly _characterListFacade: CharacterListFacade
   ) {
     this.initLoadCharactersTrigger();

@@ -4,7 +4,7 @@ import { Observable, of } from 'rxjs';
 import { catchError, map, take } from 'rxjs/operators';
 import { characterGraphQlDtoToCharacter, createBaseCharacter } from 'src/app/core/adapters/api.adapter';
 import { Character, CharacterGraphQLResponse, CharactersGraphQLResponse, PaginatedCharacters } from 'src/app/core/models/api.model';
-import { ICharacterService } from './character.service.interface';
+import { CharacterRepository } from 'src/app/core/services/character-repository.abstract';
 
 const CORE_EPISODE_FIELDS = gql`
   fragment CoreEpisodeFields on Episode{
@@ -96,7 +96,7 @@ const GET_CHARACTERS = gql`
 @Injectable({
   providedIn: 'root'
 })
-export class CharacterGraphqlService implements ICharacterService {
+export class CharacterGraphqlService implements CharacterRepository {
 
   constructor(private apollo: Apollo) { }
 

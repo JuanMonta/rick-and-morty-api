@@ -2,9 +2,8 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { LocalStorageService } from './local-storage.service';
 
-
-
 export type ApiMode = 'REST' | 'GRAPHQL'
+
 const API_MODE_KEY = "API_MODE_SELECTED"
 
 @Injectable({
