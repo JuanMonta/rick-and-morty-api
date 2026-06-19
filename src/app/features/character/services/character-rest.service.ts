@@ -5,6 +5,7 @@ import { catchError, map, shareReplay, switchMap } from 'rxjs/operators';
 import { characterRestDtoToCharacter } from 'src/app/core/adapters/api.adapter';
 import { Character, CharacterPaginatedRestDTO, CharacterRestDTO, EpisodeRestDTO, LocationRestDTO, PaginatedCharacters } from 'src/app/core/models/api.model';
 import { CharacterRepository } from 'src/app/core/services/character-repository.abstract';
+import { areUrlsEqual } from 'src/app/core/utils/url-comparation';
 import { environment } from 'src/environments/environment';
 
 export interface EnrichedLocationData {
@@ -49,7 +50,7 @@ export class CharacterRestService implements CharacterRepository {
         // origen ni location, si por alguna razon origin como location dieran vacío("") y solo usar areUrlsEqual()
         // como método único de comparación, pues daría true, así que de esta manera comprobamos que ambas url
         // existen primero antes de llegar al método evaluador de urls
-        const isSameLocation = originUrl && locationUrl && this.areUrlsEqual(originUrl, locationUrl);
+        const isSameLocation = originUrl && locationUrl && areUrlsEqual(originUrl, locationUrl);
 
         // Si son iguales clonamos el flujo, si no, creamos uno nuevo.
         const locationFlow$: Observable<EnrichedLocationData | null> = isSameLocation
@@ -113,30 +114,7 @@ export class CharacterRestService implements CharacterRepository {
   }
 
 
-  areUrlsEqual(urlA: string, urlB: string): boolean {
-    try {
-      const normalize = (urlString: string): string => {
-        const url = new URL(urlString);
 
-        // Ordenar los parámetros de búsqueda alfabéticamente
-        url.searchParams.sort();
-
-        // Remover la barra diagonal del final del path si existe
-        let pathname = url.pathname;
-        if (pathname.endsWith('/') && pathname.length > 1) {
-          pathname = pathname.slice(0, -1);
-        }
-
-        // Retornar la URL reconstruida y limpia (en minúsculas el host)
-        return `${url.protocol}//${url.host}${pathname}${url.search}`.toLowerCase();
-      };
-
-      return normalize(urlA) === normalize(urlB);
-    } catch (error) {
-      // Si alguna URL está mal formada, fallamos de forma segura comparando strings crudos
-      return urlA.trim() === urlB.trim();
-    }
-  }
 
   /**
    * Extrae los datos de la locación y busca un residente alternativo.
