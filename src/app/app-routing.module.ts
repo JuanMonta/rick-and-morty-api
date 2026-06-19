@@ -1,19 +1,20 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { CharacterDashboardPageComponent } from './layout/character-dashboard/character-dashboard-page.component';
+import { APP_ROUTES } from './core/constants/routes.dictionary';
 
 export const routes: Routes = [
   {
-    path: '',
+    path: APP_ROUTES.COMODINS.BLANK_PATH,
     component: CharacterDashboardPageComponent,
     children: [
       {
-        path: 'characters',
+        path: APP_ROUTES.CHARACTERS.ROOT,
         loadChildren: () => import('./features/character/character.module').then(m => m.CharacterModule)
       },
       {
-        path: '',
-        redirectTo: 'characters',
+        path: APP_ROUTES.COMODINS.BLANK_PATH,
+        redirectTo: APP_ROUTES.CHARACTERS.ROOT,
         pathMatch: 'full'
       }
     ]
