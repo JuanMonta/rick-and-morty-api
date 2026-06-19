@@ -1,203 +1,153 @@
 import { Injectable } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
-import { Observable } from 'rxjs';
-import { map, take } from 'rxjs/operators';
-import { CharacterModel } from '../models/character-model';
-import { CharacterPaginationModel } from '../models/character-pagination-model';
-import { EpisodeModel } from '../models/episode-model';
-import { LocationModel } from '../models/location-model';
-import { PaginationModel } from '../models/pagination-info-model';
-import { ICharacterService } from './character.service.interface';
-import { GraphqlCharacter, GraphqlMapper, GraphqlResident } from './mapper/graphql-mapper';
+import { Observable, of } from 'rxjs';
+import { catchError, map, take } from 'rxjs/operators';
+import { characterGraphQlDtoToCharacter, createBaseCharacter } from 'src/app/core/adapters/api.adapter';
+import { Character, CharacterGraphQLResponse, CharactersGraphQLResponse, PaginatedCharacters } from 'src/app/core/models/api.model';
+import { CharacterRepository } from 'src/app/core/services/character-repository.abstract';
 
-interface GetCharacterPaginationModelResponse {
-  characters: {
-    info: PaginationModel,
-    results: GraphqlCharacter[]
+const CORE_EPISODE_FIELDS = gql`
+  fragment CoreEpisodeFields on Episode{
+    name
+    air_date
+    episode
   }
-}
+`;
 
-interface GetCharacterModelResponse {
-  character: GraphqlCharacter
-}
-
-interface GetLocationModelResponse {
-  location: {
-    name: string,
-    type: string,
-    dimension: string,
-    residents: GraphqlResident[]
+const CORE_RESIDENT_FIELDS = gql`
+  fragment CoreResidentFields on Character{
+    id
+    name
   }
-}
+`;
 
-interface GetEpisodeModelResponse {
-  episode: EpisodeModel
-}
+const CORE_LOCATION_FIELDS = gql`
+${CORE_RESIDENT_FIELDS}
+  fragment CoreLocationFields on Location{
+    id
+    name
+    dimension
+    residents{
+      ...CoreResidentFields
+    }
+  }
+`;
+
+const CORE_CHARACTER_FIELDS = gql`
+  ${CORE_LOCATION_FIELDS}
+  ${CORE_EPISODE_FIELDS}
+  fragment CoreCharacterFields on Character{
+    id
+    name
+    status
+    species
+    type
+    gender
+    image
+    origin{
+      ...CoreLocationFields
+    }
+    location{
+      ...CoreLocationFields
+    }
+    episode{
+      ...CoreEpisodeFields
+    }
+    created
+  }
+`;
+
+
+const CORE_INFO_FIELDS = gql`
+  fragment CoreInfoFields on Info{
+    count
+    pages
+    next
+    prev
+  }
+`;
+
+
+const GET_CHARACTER_BY_ID = gql`
+  ${CORE_CHARACTER_FIELDS}
+  query getCharacterById($id : ID!){
+    character(id: $id){
+      ...CoreCharacterFields
+    }
+  }
+`;
 
 const GET_CHARACTERS = gql`
-  query GetCharacters($page: Int, $name: String, $status: String) {
-    characters(page: $page, filter: { name: $name, status: $status }) {
-      info {
-        count
-        pages
-        next
-        prev
+  ${CORE_INFO_FIELDS}
+  ${CORE_CHARACTER_FIELDS}
+  query GetCharacters($name : String, $status : String, $page : Int){
+    characters(filter:{name: $name, status: $status, }, page: $page){
+      info{
+        ...CoreInfoFields
       }
-      results {
-        id
-        name
-        status
-        species
-        type
-        gender
-        image
-        created
-        origin {
-          id
-          name
-        }
-        location {
-          id
-          name
-        }
-        episode{
-          id
-        }
+      results{
+        ...CoreCharacterFields
       }
     }
   }
 `;
 
-const GET_SINGLE_CHARACTER = gql`
-  query GetSingleCharacter($id: ID!){
-    character(id: $id){
-        id
-        name
-        status
-        species
-        type
-        gender
-        origin{
-            id
-            name
-        }
-        location{
-          id
-          name
-        }
-        image
-        episode{
-          id
-        }
-    }
-  }
-`;
-
-const GET_CHARACTER_LOCATION = gql`
-  query GetCharacterLocation($id: ID!){
-    location(id: $id){
-      name
-      type
-      dimension
-      residents{
-        id
-      }
-    }
-  }
-`;
-
-const GET_CHARACTER_EPISODE = gql`
-  query GetCharacterEpisode($id: ID!){
-    episode(id: $id){
-      id
-      name
-      air_date
-      episode
-    }
-  }
-`;
 
 @Injectable({
   providedIn: 'root'
 })
-export class CharacterGraphqlService implements ICharacterService {
+export class CharacterGraphqlService implements CharacterRepository {
 
   constructor(private apollo: Apollo) { }
 
-  private extractIdFromUrl(url: string | number): string {
-    if (!url) return '';
-    const value = url.toString().trim();
 
-    if (value.includes('/')) {
-      const parts = value.split('/').filter(p => p !== '');
-      return parts[parts.length - 1]
-    }
-    return value;
-  }
 
-  getSingleCharacter(idChar: number | string): Observable<CharacterModel> {
-    return this.apollo.watchQuery<GetCharacterModelResponse>({
-      query: GET_SINGLE_CHARACTER,
+  getCharacterById(id: string | number): Observable<Character> {
+
+    return this.apollo.watchQuery<CharacterGraphQLResponse>({
+      query: GET_CHARACTER_BY_ID,
       variables: {
-        id: this.extractIdFromUrl(idChar.toString())
-      }
+        id: id
+      },
+      errorPolicy: 'all', // Permite a Apollo procesar errores sin colapsar de inmediato
+      fetchPolicy: 'cache-first' // Le decimos a Apollo: "Busca en tu memoria RAM primero. Si no está, ve a la red".
     }).valueChanges.pipe(
       take(1),
-      map(response => GraphqlMapper.toCharacterModel(response.data.character))
-    );
-  }
-
-  getCharacterLocationByUrl(locationUrl: string): Observable<LocationModel> {
-    return this.apollo.watchQuery<GetLocationModelResponse>({
-      query: GET_CHARACTER_LOCATION,
-      variables: {
-        id: this.extractIdFromUrl(locationUrl)
-      }
-    }).valueChanges.pipe(
-      take(1),
-      map(response => GraphqlMapper.toLocationModel(response.data.location))
-    );
-  }
-  getCharacterByUrl(characterUrl: string): Observable<CharacterModel> {
-    return this.getSingleCharacter(this.extractIdFromUrl(characterUrl));
-  }
-
-
-
-  getEpisodeByUrl(episodeUrl: string): Observable<EpisodeModel> {
-    return this.apollo.watchQuery<GetEpisodeModelResponse>({
-      query: GET_CHARACTER_EPISODE,
-      variables: {
-        id: this.extractIdFromUrl(episodeUrl)
-      }
-    }).valueChanges.pipe(
-      take(1),
-      map(response => response.data.episode)
-    );
-  }
-
-  getCharactersByFilters(pageNumber: number, characterName: string, characterStatus: string): Observable<CharacterPaginationModel> {
-    return this.apollo.watchQuery<GetCharacterPaginationModelResponse>({
-      query: GET_CHARACTERS,
-      variables: {
-        page: pageNumber,
-        name: characterName,
-        status: characterStatus
-      }
-    }).valueChanges.pipe(
-      take(1),
-      map(response => {
-        const paginationData = response.data.characters;
-        const results = paginationData.results.map((char: GraphqlCharacter) => GraphqlMapper.toCharacterModel(char));
-
-        return {
-          ...paginationData,
-          results: results
-        } as CharacterPaginationModel;
+      map(result => {
+        const graphqlDto = result.data?.character;
+        if (graphqlDto) {
+          return characterGraphQlDtoToCharacter(graphqlDto);
+        }
+        return createBaseCharacter({});
       })
-    );;
+    );
   }
 
-
+  getCharacters(pageNumber: string | number = 1, characterName: string = '', characterStatus: string = ''): Observable<PaginatedCharacters> {
+    return this.apollo.watchQuery<CharactersGraphQLResponse>(
+      {
+        query: GET_CHARACTERS,
+        variables: {
+          name: characterName,
+          status: characterStatus,
+          page: pageNumber
+        },
+        errorPolicy: 'all', // Permite a Apollo procesar errores sin colapsar de inmediato
+        fetchPolicy: 'cache-first' // Le decimos a Apollo: "Busca en tu memoria RAM primero. Si no está, ve a la red".
+      }
+    ).valueChanges.pipe(
+      take(1),
+      map(results => {
+        const paginatedResults = results.data?.characters;
+        if (!paginatedResults) {
+          return { info: null, results: [] }
+        }
+        return { info: paginatedResults.info, results: paginatedResults.results.map(char => characterGraphQlDtoToCharacter(char)) }
+      }),
+      catchError(error => {
+        return of({ info: null, results: [] })
+      })
+    );
+  }
 
 }

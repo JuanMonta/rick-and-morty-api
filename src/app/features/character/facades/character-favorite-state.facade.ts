@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { CharacterModel } from '../models/character-model';
+import { Character } from 'src/app/core/models/api.model';
 import { LocalStorageService } from 'src/app/core/services/local-storage.service';
 
 @Injectable({
@@ -11,7 +11,7 @@ export class CharacterFavoriteStateFacade {
 
   // Para informar a nuestro character-foote.component sobre
   // la seleccion del personaje favorito
-  private favoriteCharacterSubject = new BehaviorSubject<CharacterModel | null>(this.getLocalFavoriteCharacter());
+  private favoriteCharacterSubject = new BehaviorSubject<Character | null>(null);
   favoriteCharacter$ = this.favoriteCharacterSubject.asObservable();
 
 
@@ -19,24 +19,8 @@ export class CharacterFavoriteStateFacade {
     private readonly _localStorageService: LocalStorageService
   ) { }
 
-  private getLocalFavoriteCharacter(): CharacterModel | null {
-    return this._localStorageService.getObject<CharacterModel | null>(this.localFavoriteCharacterTag);
-  }
 
-  setToggleFavoriteCharacter(characterModel: CharacterModel | null) {
-    if (characterModel) {
-
-      if (characterModel.id == this.favoriteCharacterSubject.value?.id) {
-        this._localStorageService.removeItem(this.localFavoriteCharacterTag);
-        characterModel = null;
-      } else {
-        this._localStorageService.setObject(this.localFavoriteCharacterTag, characterModel);
-      }
-
-    } else {// si character llega null
-      this._localStorageService.removeItem(this.localFavoriteCharacterTag);
-    }
-
+  setToggleFavoriteCharacter(characterModel: Character | null) {
     this.favoriteCharacterSubject.next(characterModel);
   }
 

@@ -8,20 +8,17 @@
     <span>⏳ Calculando totales... </span>
   </div>
 
-  <div
-    *ngIf="(totals$ |async) as totals"
-    class="footer-main"
-  >
+  <div class="footer-main">
     <app-totals-card
       title="Total of species"
-      [chipData]="totals.totalOfSpecies"
+      [chipData]="(speciesTotals$ | async) ?? []"
     ></app-totals-card>
 
     <div class="dividor"></div>
 
     <app-totals-card
       title="Total of types"
-      [chipData]="totals.totalOfTypes"
+      [chipData]="(typeTotals$ | async) ?? []"
     ></app-totals-card>
 
   </div>

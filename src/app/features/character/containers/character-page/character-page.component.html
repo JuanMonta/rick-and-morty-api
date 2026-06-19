@@ -39,7 +39,7 @@
     </div>
 
     <ng-container *ngIf="{
-        listCharacters: (_characterListFacade.listCharacter$ | async) ?? [],
+        listCharacters: (_characterListFacade.paginationCharacters$ | async) ?? [],
         currentPage: (_characterListFacade.currentPage$ | async) ?? 1,
         isLoadingInformation: (_characterListFacade.isLoadingInformation$ | async) ?? false,
         totalPages: (_characterListFacade.totalPages$ | async) ?? 1

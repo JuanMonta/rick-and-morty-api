@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
-import { catchError, retry, switchMap, tap } from 'rxjs/operators';
-import { CharacterModel } from 'src/app/features/character/models/character-model';
-import { CharacterService } from '../../services/character.service';
+import { catchError, map, switchMap } from 'rxjs/operators';
+import { createBaseCharacter } from 'src/app/core/adapters/api.adapter';
+import { AtributeTotal, Character } from 'src/app/core/models/api.model';
+import { CharacterRepositoryProxyService } from '../../services/character-repository-proxy.service';
 
-interface FetchTrigger {
-  page: number,
-  characterName: string,
-  characterStatus: string
+interface LoadCharactersTrigger {
+  name: string,
+  status: string,
+  page: string | number
 }
 
 @Injectable({
@@ -15,13 +16,38 @@ interface FetchTrigger {
 })
 export class CharacterListFacade {
 
+  constructor(
+    private readonly _characterService: CharacterRepositoryProxyService,
+  ) {
+    this.initLoadCharactersTrigger();
+  }
+
+
   private readonly localCharacterTotalsInfoKey = 'charactersTotals';
   private readonly locaCharacterTotalsDate = 'charactersTotalsDate';
 
+  private isLoadingInformationSubject = new BehaviorSubject<boolean>(false);
+  isLoadingInformation$: Observable<boolean> = this.isLoadingInformationSubject.asObservable();
 
-  private listCharacterSubject = new BehaviorSubject<CharacterModel[]>([]);
-  listCharacter$: Observable<CharacterModel[]> =
-    this.listCharacterSubject.asObservable();
+  //========CONSULTA DE PERSONAJES UNO POR UNO==========================================================================
+  private readonly characterStateSubject: BehaviorSubject<Character | null> = new BehaviorSubject<Character | null>(null);
+  public readonly currentCharacter$: Observable<Character | null> = this.characterStateSubject.asObservable();
+
+  //========CONTEO DE ESPECIES =========================================================================================
+  public readonly allCharactersSubject: BehaviorSubject<Character[]> = new BehaviorSubject<Character[]>([]);
+  public readonly allCharacters$: Observable<Character[]> = this.allCharactersSubject.asObservable();
+
+  public readonly speciesTotals$: Observable<AtributeTotal[]> = this.allCharacters$.pipe(
+    map(characters => this.calculateTotalsByProperty(characters, 'species'))
+  );
+
+  public readonly typeTotals$: Observable<AtributeTotal[]> = this.allCharacters$.pipe(
+    map(characters => this.calculateTotalsByProperty(characters, 'type'))
+  );
+
+  //========PARA PAGINACION=========================================================================================
+  private readonly paginationCharactersSubject: BehaviorSubject<Character[]> = new BehaviorSubject<Character[]>([]);
+  public readonly paginationCharacters$: Observable<Character[]> = this.paginationCharactersSubject.asObservable();
 
   private currentPageSubject = new BehaviorSubject<number>(1);
   currentPage$: Observable<number> = this.currentPageSubject.asObservable();
@@ -29,144 +55,81 @@ export class CharacterListFacade {
   private totalPagesSubject = new BehaviorSubject<number>(1);
   totalPages$: Observable<number> = this.totalPagesSubject.asObservable();
 
-  private isLoadingInformationSubject = new BehaviorSubject<boolean>(false);
-  isLoadingInformation$: Observable<boolean> = this.isLoadingInformationSubject.asObservable();
+  private loadCharactersTrigger: Subject<LoadCharactersTrigger> = new Subject<LoadCharactersTrigger>();
 
-  private allDiscoveredCharacters = new BehaviorSubject<Map<number, CharacterModel>>(new Map());
-  allDiscoveredCharacters$ = this.allDiscoveredCharacters.asObservable();
-
-  // Usando subject en lugar de BehaviorSubject porque el subject no dispara un valor
-  // hasta que se lo indiquemos, por otro lado behavior necesita tener que disparar un valor inicial
-  private fetchTrigger = new Subject<FetchTrigger>();
-
-  constructor(
-    private readonly _characterService: CharacterService
-  ) {
-    this.initFetchTrigger();
-    this.loadDiscoveredCharacters();
-  }
-
-
-  nextPage(characterName: string, characterStatus: string) {
-    if (
-      this.currentPageSubject.getValue() < this.totalPagesSubject.getValue()
-    ) {
-      this.loadCharacters(
-        this.currentPageSubject.getValue() + 1,
-        characterName,
-        characterStatus,
-      );
-    }
-  }
-
-  previewPage(characterName: string, characterStatus: string) {
-    if (this.currentPageSubject.getValue() > 1) {
-      this.loadCharacters(
-        this.currentPageSubject.getValue() - 1,
-        characterName,
-        characterStatus,
-      );
-    }
-  }
-
-  private initFetchTrigger() {
-    this.fetchTrigger.pipe(
-      tap(() => this.isLoadingInformationSubject.next(true)),
-      switchMap((filtros) => {
-
-        return this._characterService.getCharactersByFilters(filtros.page, filtros.characterName, filtros.characterStatus)
-          .pipe(
-            // Factor de resiliencia, aquí decimos que si por algún error de red
-            // u otro, que intente de nuevo la peticion http una ves mas (1)
-            retry(1),
-            // usamos tap en lugar de map para mutar la respuesta, ya que
-            // map se usa exclusivamente para transformar datos y retornarlos
-            tap((resp) => {
-              this.managerLoadCharactersRespoponse(
-                resp.results,
-                resp.info.pages,
-                filtros.page
-              );
-            }),
-            catchError((err) => {
-              // Valores por defecto ante un error
-              this.managerLoadCharactersRespoponse([], 1, 1);
-              return of([]) // Retornamos un array vacío para que el stream principal no muera
-            })
-          );
+  /**
+   * Configura la escucha reactiva que se encarga de cancelar peticiones repetidas.
+   */
+  private initLoadCharactersTrigger(): void {
+    this.loadCharactersTrigger.pipe(
+      //Si entra un nuevo objeto con parámetros antes de que
+      // la petición anterior termine, switchMap mata la petición HTTP anterior en la red.
+      switchMap(params => {
+        // Guardamos la página actual de forma síncrona preventiva
+        this.currentPageSubject.next(Number(params.page));
+        this.isLoadingInformationSubject.next(true);
+        // Retornamos la consulta al repositorio para que switchMap la controle
+        return this._characterService.getCharacters(params.page, params.name, params.status).pipe(
+          // ¡ESCUDO! Si esta petición específica falla, todo fallará para siempre hasta que se cargue la página,
+          // por ello retornamos un objeto vacío y el flujo principal (loadCharactersTrigger) NO muere.
+          catchError(error => {
+            console.error('[RAM Audit] Fallo al cargar personajes:', error);
+            this.isLoadingInformationSubject.next(false);
+            return of({ info: null, results: [] })
+          })
+        );
       })
-    ).subscribe();
+    ).subscribe(response => {
+      this.totalPagesSubject.next((response.info?.pages) ?? 1);
+
+      const incomingCharacters = response.results;
+      this.paginationCharactersSubject.next(incomingCharacters);
+      this.isLoadingInformationSubject.next(false);
+
+      // LLENADO DE LA VARIABLE QUE POSTERIORMENT HACE LOS CALCULOS DE SPCIES Y TYPE
+      let currentCharacters = this.allCharactersSubject.getValue();
+      // Filtramos los nuevos personajes dejando pasar solo aquellos cuyo ID NO exista en la lista histórica
+      const uniqueCharacters = incomingCharacters.filter(incomingChar =>
+        !currentCharacters.some(existingChar => existingChar.id == incomingChar.id)
+      )
+      this.allCharactersSubject.next([...currentCharacters, ...uniqueCharacters]);
+      /* console.log(
+        `[RAM Audit] Histórico previo: ${currentCharacters.length} | Nuevos detectados: ${incomingCharacters.length} | Insertados únicos: ${uniqueCharacters.length}`
+      );
+      console.log('[Contenido Total RAM]', this.allCharactersSubject.getValue()); */
+    });
   }
+
+  //=======================================================================================================================
 
   /**
    * Obtener personajes usando pahinación y filtros.
    */
-  loadCharacters(
-    updateCurrentPage: number,
-    characterName: string,
-    characterStatus: string,
-  ) {
-    this.currentPageSubject.next(updateCurrentPage);
-    this.fetchTrigger.next({
-      page: this.currentPageSubject.getValue(),
-      characterName: characterName,
-      characterStatus: characterStatus
-    }
-    );
+  loadCharacters(updateCurrentPage: string | number, characterName: string, characterStatus: string) {
+    this.loadCharactersTrigger.next({ name: characterName, status: characterStatus, page: updateCurrentPage });
   }
 
 
-
-  private managerLoadCharactersRespoponse(
-    characters: CharacterModel[],
-    totalPages: number,
-    currentPage: number,
-  ) {
-    this.listCharacterSubject.next(characters);
-    this.totalPagesSubject.next(totalPages);
-    this.currentPageSubject.next(currentPage);
-    this.updateDiscovedCharacters(characters);
-    this.isLoadingInformationSubject.next(false);
+  loadCharacter(id: string | number) {
+    this._characterService.getCharacterById(id).subscribe((character: Character) => this.characterStateSubject.next(character));
   }
 
-  private updateDiscovedCharacters(characters: CharacterModel[]) {
-    const currentMap = this.allDiscoveredCharacters.value;
-    characters.forEach((character) => {
-      if (!currentMap.has(character.id)) {
-        currentMap.set(character.id, character);
+  public calculateTotalsByProperty(characters: Character[], property: 'species' | 'type'): AtributeTotal[] {
+    const countsMap: { [key: string]: number } = {};
+
+    characters.forEach(char => {
+      const value = char[property] === '' || !char[property] ? 'Desconocido' : char[property];
+      countsMap[value] = (countsMap[value] || 0) + 1;
+    });
+
+    const totals: AtributeTotal[] = Object.keys(countsMap).map(property => {
+      return {
+        key: property,
+        count: countsMap[property]
       }
     });
-    this.saveDiscoveredCharacters(currentMap);
-    this.allDiscoveredCharacters.next(new Map(currentMap));
+    return totals;
   }
 
-  private saveDiscoveredCharacters(charactersMap: Map<number, CharacterModel>) {
-    console.log('Calculo progresivo de totales terminado. Guardando en caché.');
-    localStorage.setItem(this.localCharacterTotalsInfoKey, JSON.stringify(Array.from(charactersMap.entries())));
-    localStorage.setItem(this.locaCharacterTotalsDate, new Date().getTime().toString());
-  }
 
-  private loadDiscoveredCharacters() {
-    const cacheDatos = localStorage.getItem(this.localCharacterTotalsInfoKey);
-    const cacheFecha = localStorage.getItem(this.locaCharacterTotalsDate);
-
-    //Verificar que el calculo de totales ya haran sido guardados,
-    // claro primeramente, debe terminar de hacer los calculos de totales
-    // antes de ser cacheados. Si se recarga la página antes de terminar
-    // de calcular los totales, pues comenzará de nuevo el cálculo desde cero.
-    if (cacheDatos && cacheFecha) {
-      const time = (new Date().getTime() - parseInt(cacheFecha, 10)) / (1000 * 60 * 60);
-
-      // Nos sirve para caché en localStorage, si no han pasado 24 horas, solamente
-      // carga los datos almacenados para no cargar los totales de la api
-      // cada que la pagina se recarga,
-      if (time < 24) {
-        const mapEntries = JSON.parse(cacheDatos);
-        const charactersLocalTotal = new Map<number, CharacterModel>(mapEntries);
-        console.log('Cargando datos de totales desde cache local.');
-        this.allDiscoveredCharacters.next(new Map(charactersLocalTotal));
-      }
-    }
-
-  }
 }

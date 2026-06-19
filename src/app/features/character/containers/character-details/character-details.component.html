@@ -1,7 +1,7 @@
 <div class="contenedor-detalles">
   <ng-container *ngIf="{
     isLoading : _characterDetailsFacade.isLoading$ | async,
-    characterFullDetails : _characterDetailsFacade.fullCharacterDetails$ | async
+    characterFullDetails : character$ | async
   } as vm">
 
     <div
@@ -14,19 +14,19 @@
 
     <mat-card
       class="character-tarjeta mat-elevation-z4"
-      *ngIf="!vm.isLoading && vm.characterFullDetails as details; else sinSeleccion"
+      *ngIf="!vm.isLoading && vm.characterFullDetails as char; else sinSeleccion"
     >
 
       <mat-card-content class="layout-vertical">
 
         <div class="tarjeta-header-personalizado">
           <app-avatar
-            [imageUrl]="details.character.image"
-            [characterName]="details.character.name"
+            [imageUrl]="char.image"
+            [characterName]="char.name"
             size="150px"
             [isCircular]="true"
           ></app-avatar>
-          <h2>{{ details.character.name }}</h2>
+          <h2>{{ char.name }}</h2>
         </div>
 
         <mat-divider></mat-divider>
@@ -36,25 +36,25 @@
 
             <mat-list-item>
               <mat-icon mat-list-icon>fingerprint</mat-icon>
-              <div mat-line><strong>Species:</strong> {{ details.character.species }}</div>
+              <div mat-line><strong>Species:</strong> {{ char.species }}</div>
             </mat-list-item>
 
             <mat-list-item>
               <mat-icon mat-list-icon>public</mat-icon>
-              <div mat-line><strong>Origin:</strong> {{ details.originInfo.name }}</div>
+              <div mat-line><strong>Origin:</strong> {{ char.origin.name }}</div>
               <div
                 mat-line
                 class="sub-line"
-              >Resident: {{ details.originInfo.resident }}</div>
+              >Resident: {{ char.origin.residentName }}</div>
             </mat-list-item>
 
             <mat-list-item>
               <mat-icon mat-list-icon>place</mat-icon>
-              <div mat-line><strong>Location:</strong> {{ details.locationInfo.name }}</div>
+              <div mat-line><strong>Location:</strong> {{ char.location.name }}</div>
               <div
                 mat-line
                 class="sub-line"
-              >Resident: {{ details.locationInfo.resident }}</div>
+              >Resident: {{ char.location.residentName }}</div>
             </mat-list-item>
 
             <mat-list-item>
@@ -63,9 +63,9 @@
               <div
                 mat-line
                 class="sub-line"
-                *ngIf="details.episode && details.episode.length > 0; else noEpisode"
+                *ngIf="char.episode; else noEpisode"
               >
-                {{ details.episode[0]?.episode }} - {{ details.episode[0]?.name }}
+                {{ (char.episode.episode) }} - {{ char.episode.name }}
               </div>
               <ng-template #noEpisode>
                 <div
