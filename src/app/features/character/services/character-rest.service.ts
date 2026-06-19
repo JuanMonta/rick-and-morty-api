@@ -1,11 +1,17 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { forkJoin, Observable, of } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { catchError, map, shareReplay, switchMap } from 'rxjs/operators';
 import { characterRestDtoToCharacter } from 'src/app/core/adapters/api.adapter';
 import { Character, CharacterPaginatedRestDTO, CharacterRestDTO, EpisodeRestDTO, LocationRestDTO, PaginatedCharacters } from 'src/app/core/models/api.model';
 import { CharacterRepository } from 'src/app/core/services/character-repository.abstract';
 import { environment } from 'src/environments/environment';
+
+export interface EnrichedLocationData {
+  dimension: string;
+  url: string;
+  residentName: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -34,70 +40,23 @@ export class CharacterRestService implements CharacterRepository {
         const firstEpisodeUrl = rawEpisodeUrls[0] || '';
 
         // Definimos los hilos paralelos con sus respectivos fusibles individuales (catchError)
-        const originFlow$ = originUrl
-          ? this._http.get<LocationRestDTO>(originUrl).pipe(
-            switchMap((location: LocationRestDTO) => {
-              const alternateResidentUrl = location.residents?.find(url => !url.endsWith(`/${baseCharacter.id}` || ''));
-
-              if (!alternateResidentUrl) {
-                return of({
-                  dimension: location.dimension,
-                  url: location.url,
-                  residentName: 'No tiene residentes'
-                })
-              }
-
-              return this._http.get<LocationRestDTO>(alternateResidentUrl).pipe(
-                map(charDto => ({
-                  dimension: location.dimension,
-                  url: location.url,
-                  residentName: charDto.name
-                })),
-
-                catchError(() => of({
-                  dimension: location.dimension,
-                  url: location.url,
-                  residentName: 'Residente no disponible'
-                }))
-              );
-
-            }),
-            catchError(() => of(null))
-          )
+        const originFlow$: Observable<EnrichedLocationData | null> = originUrl
+          ? this.getEnrichedLocation(originUrl, baseCharacter.id).pipe(shareReplay(1))// Sharedreplay 'cachea' el resultado de ese Observable específico
           : of(null);
 
-        const locationFlow$ = locationUrl
-          ? this._http.get<LocationRestDTO>(locationUrl).pipe(
-            switchMap((location: LocationRestDTO) => {
-              const alternateResidentUrl = location.residents?.find(url => !url.endsWith(`/${baseCharacter.id}` || ''));
+        // Evaluamos si es necesario hacer una consulta nueva o si podemos reciclar la del Origin
+        // Comparamos originUrl y locationUrl tambien en la misma línea porque hay personajes que no tienen
+        // origen ni location, si por alguna razon origin como location dieran vacío("") y solo usar areUrlsEqual()
+        // como método único de comparación, pues daría true, así que de esta manera comprobamos que ambas url
+        // existen primero antes de llegar al método evaluador de urls
+        const isSameLocation = originUrl && locationUrl && this.areUrlsEqual(originUrl, locationUrl);
 
-              if (!alternateResidentUrl) {
-                return of({
-                  dimension: location.dimension,
-                  url: location.url,
-                  residentName: 'No tiene residentes'
-                })
-              }
-
-              return this._http.get<LocationRestDTO>(alternateResidentUrl).pipe(
-                map(charDto => ({
-                  dimension: location.dimension,
-                  url: location.url,
-                  residentName: charDto.name
-                })),
-
-                catchError(() => of({
-                  dimension: location.dimension,
-                  url: location.url,
-                  residentName: 'Residente no disponible'
-                }))
-              );
-
-            }),
-
-            catchError(() => of(null))
-          )
-          : of(null);
+        // Si son iguales clonamos el flujo, si no, creamos uno nuevo.
+        const locationFlow$: Observable<EnrichedLocationData | null> = isSameLocation
+          ? originFlow$
+          : locationUrl
+            ? this.getEnrichedLocation(locationUrl, baseCharacter.id)
+            : of(null);
 
         const episodeFlow$ = firstEpisodeUrl
           ? this._http.get<EpisodeRestDTO>(firstEpisodeUrl).pipe(catchError(() => of(null)))
@@ -154,7 +113,66 @@ export class CharacterRestService implements CharacterRepository {
   }
 
 
+  areUrlsEqual(urlA: string, urlB: string): boolean {
+    try {
+      const normalize = (urlString: string): string => {
+        const url = new URL(urlString);
 
+        // Ordenar los parámetros de búsqueda alfabéticamente
+        url.searchParams.sort();
 
+        // Remover la barra diagonal del final del path si existe
+        let pathname = url.pathname;
+        if (pathname.endsWith('/') && pathname.length > 1) {
+          pathname = pathname.slice(0, -1);
+        }
+
+        // Retornar la URL reconstruida y limpia (en minúsculas el host)
+        return `${url.protocol}//${url.host}${pathname}${url.search}`.toLowerCase();
+      };
+
+      return normalize(urlA) === normalize(urlB);
+    } catch (error) {
+      // Si alguna URL está mal formada, fallamos de forma segura comparando strings crudos
+      return urlA.trim() === urlB.trim();
+    }
+  }
+
+  /**
+   * Extrae los datos de la locación y busca un residente alternativo.
+   */
+  private getEnrichedLocation(locationUrl: string, currentCharacterId: number | string): Observable<EnrichedLocationData | null> {
+    if (!locationUrl) return of(null);
+
+    return this._http.get<LocationRestDTO>(locationUrl).pipe(
+      switchMap((location: LocationRestDTO) => {
+        // Buscamos un residente cuya URL NO termine con el ID del personaje actual
+        const alternateResidentUrl = location.residents?.find(url => !url.endsWith(`/${currentCharacterId}`));
+
+        if (!alternateResidentUrl) {
+          return of({
+            dimension: location.dimension,
+            url: location.url,
+            residentName: 'No tiene residentes'
+          });
+        }
+
+        // Un residente devuelve un CharacterRestDTO
+        return this._http.get<CharacterRestDTO>(alternateResidentUrl).pipe(
+          map(charDto => ({
+            dimension: location.dimension,
+            url: location.url,
+            residentName: charDto.name
+          })),
+          catchError(() => of({
+            dimension: location.dimension,
+            url: location.url,
+            residentName: 'Residente no disponible'
+          }))
+        );
+      }),
+      catchError(() => of(null))
+    );
+  }
 
 }
