@@ -12,7 +12,7 @@
       <app-chip
         *ngFor="let total of chipData"
         [color]="title.toLowerCase().includes('species') ? '#0a5377' : '#2e7d32'"
-        [text]="total.key"
+        [text]="total.key +' '+ total.count"
       >
       </app-chip>
     </mat-chip-list>
