@@ -18,10 +18,7 @@ export class TelemetryService {
         event instanceof NavigationEnd
       )
     ).subscribe((event: NavigationEnd) => {
-
-      if (event instanceof NavigationEnd) {
-        console.warn('%c[Telemetry 📡] Hit registrado: Usuario navegó a ->' + event.urlAfterRedirects, 'color:rgb(4, 14, 146); font-weight: bold;');
-      }
+      console.warn('%c[Telemetry 📡] Hit registrado: Usuario navegó a ->' + event.urlAfterRedirects, 'color:rgb(4, 14, 146); font-weight: bold;');
     });
   }
 
