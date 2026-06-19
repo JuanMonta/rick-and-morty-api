@@ -1,8 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
-import { CharacterDetailsFacade } from '../../facades/character-details.facade';
-import { CharacterFavoriteStateFacade } from '../../facades/character-favorite-state.facade';
 import { Character } from 'src/app/core/models/api.model';
+import { CharacterFavoriteStateFacade } from '../../facades/character-favorite-state.facade';
+import { CharacterListFacade } from '../../pages/facades/character-list.facade';
 
 @Component({
   selector: 'app-character-table',
@@ -21,7 +21,7 @@ export class CharacterTableComponent implements OnInit {
 
   constructor(
     readonly _characterFavoriteStateService: CharacterFavoriteStateFacade,
-    readonly _characterDetailsFacade: CharacterDetailsFacade
+    readonly _characterListFacade: CharacterListFacade
   ) { }
 
   ngOnInit(): void {
@@ -32,7 +32,7 @@ export class CharacterTableComponent implements OnInit {
   }
 
   setSelectedCharacter(character: Character) {
-    this._characterDetailsFacade.loadCharacter(character.id);
+    this._characterListFacade.loadCharacter(character.id);
   }
 
 }

@@ -30,8 +30,8 @@ export class CharacterListFacade {
   isLoadingInformation$: Observable<boolean> = this.isLoadingInformationSubject.asObservable();
 
   //========CONSULTA DE PERSONAJES UNO POR UNO==========================================================================
-  private readonly characterStateSubject: BehaviorSubject<Character> = new BehaviorSubject<Character>(createBaseCharacter({}));
-  public readonly currentCharacter$: Observable<Character> = this.characterStateSubject.asObservable();
+  private readonly characterStateSubject: BehaviorSubject<Character | null> = new BehaviorSubject<Character | null>(null);
+  public readonly currentCharacter$: Observable<Character | null> = this.characterStateSubject.asObservable();
 
   //========CONTEO DE ESPECIES =========================================================================================
   public readonly allCharactersSubject: BehaviorSubject<Character[]> = new BehaviorSubject<Character[]>([]);
@@ -93,10 +93,10 @@ export class CharacterListFacade {
         !currentCharacters.some(existingChar => existingChar.id == incomingChar.id)
       )
       this.allCharactersSubject.next([...currentCharacters, ...uniqueCharacters]);
-      console.log(
+      /* console.log(
         `[RAM Audit] Histórico previo: ${currentCharacters.length} | Nuevos detectados: ${incomingCharacters.length} | Insertados únicos: ${uniqueCharacters.length}`
       );
-      console.log('[Contenido Total RAM]', this.allCharactersSubject.getValue());
+      console.log('[Contenido Total RAM]', this.allCharactersSubject.getValue()); */
     });
   }
 
