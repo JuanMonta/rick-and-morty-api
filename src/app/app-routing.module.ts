@@ -1,9 +1,10 @@
 import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { CharacterDashboardPageComponent } from './layout/character-dashboard/character-dashboard-page.component';
+import { RouterModule } from '@angular/router';
 import { APP_ROUTES } from './core/constants/routes.dictionary';
+import { AppRoutes } from './core/models/routing.model';
+import { CharacterDashboardPageComponent } from './layout/character-dashboard/character-dashboard-page.component';
 
-export const routes: Routes = [
+export const routes: AppRoutes = [
   // Redirección Inicial Asegurada: Envía la raíz hacia la característica perezosa (Login)
   {
     path: APP_ROUTES.COMODINS.BLANK_PATH,

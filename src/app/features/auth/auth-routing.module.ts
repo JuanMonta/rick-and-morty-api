@@ -1,9 +1,9 @@
-import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './components/login/login.component';
+import { AppRoutes } from 'src/app/core/models/routing.model';
 
-const routes: Routes = [
+const routes: AppRoutes = [
   {
     path: '', // Ruta base perezosa que se monta al escribir /login
     component: LoginComponent,
