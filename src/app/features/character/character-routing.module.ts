@@ -1,9 +1,10 @@
-import { APP_ROUTES } from './../../core/constants/routes.dictionary';
 import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { RouterModule } from '@angular/router';
+import { AppRoutes } from 'src/app/core/models/routing.model';
+import { APP_ROUTES } from './../../core/constants/routes.dictionary';
 import { CharacterPageComponent } from './containers/character-page/character-page.component';
 
-const routes: Routes = [
+const routes: AppRoutes = [
   {
     path: APP_ROUTES.COMODINS.BLANK_PATH, // Cuando la ruta sea /characters/'', carga este componente por defecto:
     component: CharacterPageComponent
