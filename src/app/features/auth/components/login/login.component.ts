@@ -1,5 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { APP_ROUTES } from 'src/app/core/constants/routes.dictionary';
+import { AuthService } from 'src/app/core/services/auth.service';
+import { NotificationService } from 'src/app/core/services/notification.service';
+
 
 @Component({
   selector: 'app-login',
@@ -14,6 +19,9 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private readonly fb: FormBuilder,
+    private readonly authService: AuthService,
+    private readonly router: Router,
+    private readonly notificationService: NotificationService // Inyectamos las alertas flotantes
   ) {
     // Inicializamos el formulario reactivo con reglas rígidas de validación síncrona
     this.loginForm = this.fb.group({
@@ -26,7 +34,21 @@ export class LoginComponent implements OnInit {
   }
 
   public onSubmit(): void {
+    if (this.loginForm.invalid) {
+      this.notificationService.showWarning('Por favor, llena los campos obligatorios de forma correcta.');
+      return;
+    }
 
+    const { email, password } = this.loginForm.value;
+    const loginSuccess = this.authService.login(email, password); // Evaluamos contra los mocks del core
+
+    if (loginSuccess) {
+      this.notificationService.showSuccess('Identidad Confirmada. Bienvenido a la Ciudadela.');
+      this.router.navigate(['/', APP_ROUTES.DASHBOARD.ROOT]); // Redirección instantánea autorizada
+    } else {
+      this.notificationService.showError('Acceso Denegado: Credenciales no registradas en este universo.');
+    }
   }
 
 }
+
