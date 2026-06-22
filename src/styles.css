@@ -62,5 +62,44 @@ evitando que los contenedores crezcan sin control. */
   }
 }
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+
+/* ==========================================================================
+   ESTILOS PARA EL SERVICIO DE NOTIFICACIONES (ANGULAR MATERIAL)
+   ========================================================================== */
+
+/* Fondo Verde para operaciones exitosas */
+.snackbar-success {
+  background-color: #2ed573 !important;
+  color: #ffffff !important;
+  font-weight: bold;
+}
+
+/* Fondo Amarillo/Naranja para advertencias de flujo */
+.snackbar-warning {
+  background-color: #ffa502 !important;
+  color: #ffffff !important;
+  font-weight: bold;
+}
+
+/* Fondo Rojo para violaciones de Guards, errores HTTP o accesos denegados */
+.snackbar-error {
+  background-color: #ff4757 !important;
+  color: #ffffff !important;
+  font-weight: bold;
+}
+
+/* Forzar que el texto del botón de acción en el snackbar sea legible */
+.mat-simple-snackbar-action {
+  color: #ffffff !important;
+  font-weight: 900 !important;
+}
