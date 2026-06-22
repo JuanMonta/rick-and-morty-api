@@ -1,0 +1,80 @@
+<div
+  class="login-container"
+  style="display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f5f6fa;"
+>
+
+  <mat-card style="width: 400px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-radius: 8px;">
+    <mat-card-header style="justify-content: center; margin-bottom: 20px;">
+      <mat-card-title style="font-size: 24px; font-weight: bold; color: #2c3e50; text-align: center;">
+        CONTROL DE ACCESO MULTIVERSAL
+      </mat-card-title>
+    </mat-card-header>
+
+    <form
+      [formGroup]="loginForm"
+      (ngSubmit)="onSubmit()"
+      style="display: flex; flex-direction: column; gap: 15px;"
+    >
+
+      <mat-form-field
+        appearance="outline"
+        style="width: 100%;"
+      >
+        <mat-label>Correo de la Federación/Citadel</mat-label>
+        <input
+          matInput
+          type="email"
+          formControlName="email"
+          placeholder="ejemplo@citadel.com"
+          autocomplete="username"
+        >
+        <mat-icon
+          matSuffix
+          color="primary"
+        >email</mat-icon>
+        <mat-error *ngIf="loginForm.get('email')?.hasError('email')">El formato del correo no es válido</mat-error>
+        <mat-error *ngIf="loginForm.get('email')?.hasError('required')">El correo es obligatorio</mat-error>
+      </mat-form-field>
+
+      <mat-form-field
+        appearance="outline"
+        style="width: 100%;"
+      >
+        <mat-label>Clave de Encriptación</mat-label>
+        <input
+          matInput
+          [type]="hidePassword ? 'password' : 'text'"
+          formControlName="password"
+          autocomplete="current-password"
+        >
+        <button
+          type="button"
+          mat-icon-button
+          matSuffix
+          (click)="hidePassword = !hidePassword"
+          aria-label="Alternar visibilidad de contraseña"
+        >
+          <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        <mat-error *ngIf="loginForm.get('password')?.hasError('required')">La contraseña es obligatoria</mat-error>
+      </mat-form-field>
+
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        style="padding: 10px; font-weight: bold; font-size: 16px; margin-top: 10px;"
+        [disabled]="loginForm.invalid"
+      >
+        Ingresar al Portal
+      </button>
+
+    </form>
+
+    <div style="margin-top: 20px; font-size: 11px; color: #7f8c8d; text-align: center; line-height: 1.4;">
+      *Cuentas válidas en memoria:<br>
+      rick&#64;citadel.com (Clave: 123) | morty&#64;citadel.com (Clave: 456) | jerry&#64;citadel.com (Clave: 789)
+    </div>
+  </mat-card>
+
+</div>
