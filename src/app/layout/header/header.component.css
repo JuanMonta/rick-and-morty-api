@@ -9,6 +9,17 @@
   box-shadow: 0 2px 10px rgba(77, 74, 74, 0.3);
 }
 
+.left-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  /* Espaciado entre el botón de menú y el avatar/texto */
+}
+
+.menu-button {
+  color: rgb(206, 196, 196);
+}
+
 .section-title {
   font-size: 0.7rem;
   color: #fdfafa;

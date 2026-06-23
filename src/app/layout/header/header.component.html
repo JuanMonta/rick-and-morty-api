@@ -1,40 +1,49 @@
 <header class="main-header">
-  <section class="favorito-section">
 
-    <span class="section-title">★ MY FAVORITE CHARACTER</span>
-    <div
-      class="header-favorito"
-      *ngIf="_characterFavoriteStateService.favoriteCharacter$ | async as favorito ; else sinFavorito"
+  <div class="left-section">
+
+    <button
+      mat-icon-button
+      class="menu-button"
+      title="Abrir menú lateral"
     >
+      <mat-icon>menu</mat-icon>
+    </button>
 
+    <section class="favorito-section">
+      <span class="section-title">★ MY FAVORITE CHARACTER</span>
       <div
-        class="primary-section"
-        style="cursor: pointer;"
-        (click)="toggleCharacterextraInfo()"
+        class="header-favorito"
+        *ngIf="_characterFavoriteStateService.favoriteCharacter$ | async as favorito ; else sinFavorito"
       >
-        <app-avatar
-          [imageUrl]="favorito.image"
-          [characterName]="favorito.name"
-          size="50px"
-          [isCircular]="false"
-        ></app-avatar>
+        <div
+          class="primary-section"
+          style="cursor: pointer;"
+          (click)="toggleCharacterextraInfo()"
+        >
+          <app-avatar
+            [imageUrl]="favorito.image"
+            [characterName]="favorito.name"
+            size="50px"
+            [isCircular]="false"
+          ></app-avatar>
 
-        <div class="character-block">
-          <h2 class="character-name">{{favorito.name}}</h2>
+          <div class="character-block">
+            <h2 class="character-name">{{favorito.name}}</h2>
+          </div>
+        </div>
+
+        <div
+          class="info-section"
+          [ngStyle]="showCharacterExtraInfo ? {'visibility': 'visible'} : {'visibility': 'hidden'}"
+        >
+          <p><strong>Origin: </strong> {{favorito.origin.name}} </p>
+          <p><strong>Gender: </strong> {{favorito.gender}} </p>
+          <p><strong>Especies: </strong> {{favorito.species}} </p>
         </div>
       </div>
-
-      <div
-        class="info-section"
-        [ngStyle]="showCharacterExtraInfo ? {'visibility': 'visible'} : {'visibility': 'hidden'}"
-      >
-        <p><strong>Origin: </strong> {{favorito.origin.name}} </p>
-        <p><strong>Gender: </strong> {{favorito.gender}} </p>
-        <p><strong>Especies: </strong> {{favorito.species}} </p>
-      </div>
-    </div>
-
-  </section>
+    </section>
+  </div>
 
   <div class="actions-section">
     <section>
