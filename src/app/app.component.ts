@@ -40,11 +40,11 @@ export class AppComponent implements OnInit {
       }
 
       if (event instanceof NavigationCancel) {
-        console.log(`[Router Audit] Transición abortada hacia: ${event.url}. Razón: Guardia activa.`);
+        console.warn(`%c[Router Audit ⚠️] Transición abortada hacia: ${event.url}. Razón: Guardia activa.`, 'color: #f39c12; font-weight: bold;');
       }
 
       if (event instanceof NavigationError) {
-        console.error(`[Router Emergency] Fallo catastrófico en ruta: ${event.url}. Causa:`, event.error);
+        console.error(`[Router Emergency] Fallo catastrófico en ruta: ${event.url}. Causa:`, 'color: #ff4757; font-weight: bold;', event.error);
       }
     });
   }
