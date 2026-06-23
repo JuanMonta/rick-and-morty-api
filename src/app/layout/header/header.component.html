@@ -36,39 +36,37 @@
 
   </section>
 
-  <section class="api-config-section">
-    <div class="api-toggle-wrapper">
-      <span
-        class="mode-label"
-        [class.active]="apiConfig.currentMode === 'REST'"
-      >REST</span>
+  <div class="actions-section">
+    <section>
+      <div class="api-toggle-wrapper">
+        <span
+          class="mode-label"
+          [class.active]="apiConfig.currentMode === 'REST'"
+        >REST</span>
 
-      <button
-        class="toggle-track"
-        (click)="apiConfig.toggleApiMode()"
-        title="Cambiar fuente de datos"
-      >
-        <div
-          class="toggle-thumb"
-          [class.graphql-mode]="apiConfig.currentMode === 'GRAPHQL'"
-        ></div>
-      </button>
+        <mat-slide-toggle
+          [checked]="apiConfig.currentMode ==='GRAPHQL'"
+          (change)="apiConfig.toggleApiMode()"
+          aria-label="Cambiar fuente de datos"
+        >
+        </mat-slide-toggle>
 
-      <span
-        class="mode-label"
-        [class.active]="apiConfig.currentMode === 'GRAPHQL'"
-      >GraphQL</span>
-    </div>
-  </section>
+        <span
+          class="mode-label"
+          [class.active]="apiConfig.currentMode === 'GRAPHQL'"
+        >GraphQL</span>
+      </div>
+    </section>
 
-  <button
-    mat-flat-button
-    color="warn"
-    (click)="onLogout()"
-    style="font-weight: bold; font-size: 12px;"
-  >
-    Cerrar Portal (Logout)
-  </button>
+    <button
+      mat-flat-button
+      color="warn"
+      (click)="onLogout()"
+      style="font-weight: bold; font-size: 12px;"
+    >
+      Cerrar Portal (Logout)
+    </button>
+  </div>
 
 </header>
 
