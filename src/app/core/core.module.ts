@@ -3,12 +3,22 @@ import { CommonModule } from '@angular/common';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { HttpCacheInterceptor } from './interceptors/http-cache.interceptor';
 import { ApiAuditInterceptor } from './interceptors/api-audit.interceptor';
+import { AccessDeniedComponent } from './components/access-denied/access-denied.component';
+import { NotFoundComponent } from './components/not-found/not-found.component';
+import { SharedModule } from '../shared/shared.module';
+import { RouterModule } from '@angular/router';
+
 
 
 @NgModule({
-  declarations: [],
+  declarations: [
+    AccessDeniedComponent,
+    NotFoundComponent
+  ],
   imports: [
-    CommonModule
+    CommonModule,
+    SharedModule,
+    RouterModule
   ],
   exports: [
   ],
