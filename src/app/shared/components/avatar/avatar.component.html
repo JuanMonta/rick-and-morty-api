@@ -15,7 +15,7 @@
 
   <img
     *ngIf="imageUrl && !hasError"
-    [src]="imageUrl"
+    [src]="displayImageUrl"
     [alt]="characterName"
     (load)="onImageLoad()"
     (error)="onImageLoadError()"

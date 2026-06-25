@@ -7,7 +7,7 @@ import { Component, OnInit, Input } from '@angular/core';
 })
 export class AvatarComponent implements OnInit {
 
-  @Input() imageUrl: string = '';
+  @Input() imageUrl: string | undefined = '';
   @Input() characterName: string = '';
   @Input() size: string = '40px';
   @Input() isCircular: boolean = false;
@@ -16,9 +16,22 @@ export class AvatarComponent implements OnInit {
   isImageLoaded = false;
   hasError = false;
 
+  private readonly DEFAULT_AVATAR = "https://rickandmortyapi.com/api/character/avatar/104.jpeg"
+
   constructor() { }
 
   ngOnInit(): void {
+  }
+
+  /**
+   * Si 'imageUrl' es undefined, null o un string vacío '',
+   * devuelvela imagen por defecto.
+   */
+  get displayImageUrl(): string {
+    if (!this.imageUrl || this.imageUrl.trim() === '') {
+      return this.DEFAULT_AVATAR;
+    }
+    return this.imageUrl;
   }
 
   get characterNameInitials(): string {
