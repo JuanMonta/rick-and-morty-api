@@ -1,0 +1,104 @@
+/* Contenedor principal del menú lateral */
+.sidebar-container {
+  width: 260px;
+  height: 100vh;
+  background-color: #1e222b;
+  /* Tono oscuro complementario al header */
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  border-right: 1px solid #2d323e;
+}
+
+/* --- Bloque de Perfil de Usuario --- */
+.user-profile-section {
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: linear-gradient(180deg, #1c2027 0%, #1e222b 100%);
+}
+
+.avatar-wrapper {
+  margin-bottom: 12px;
+}
+
+.user-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  /* Anillo Cyan alineado al estilo de la app */
+  border: 2px solid #00b5cc;
+  box-shadow: 0 4px 12px rgba(0, 181, 204, 0.25);
+  display: block;
+  aspect-ratio: 1 / 1;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.user-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fdfafa;
+  letter-spacing: 0.3px;
+}
+
+.user-role {
+  font-size: 0.75rem;
+  color: #8a94a6;
+  font-weight: 500;
+}
+
+/* --- Divisor --- */
+.sidebar-divider {
+  border-top-color: #2d323e !important;
+}
+
+/* --- Lista de Navegación --- */
+.navigation-list {
+  padding-top: 16px !important;
+  flex-grow: 1;
+}
+
+/* Estilo base para cada uno de los 4 botones */
+.nav-item {
+  height: 48px !important;
+  margin: 4px 12px !important;
+  border-radius: 8px !important;
+  color: #8a94a6 !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+/* Efecto Hover (pasar el mouse por encima) */
+.nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+  color: #ffffff !important;
+}
+
+/* Clase automática activa gestionada por Angular Router */
+.active-link {
+  /* Fondo Cyan corporativo translúcido */
+  background-color: rgba(0, 181, 204, 0.12) !important;
+  /* Texto iluminado */
+  color: #00b5cc !important;
+  font-weight: bold !important;
+}
+
+/* Alineación y comportamiento de los iconos dentro del botón */
+.nav-item mat-icon {
+  /* Hereda el color del estado (gris, blanco o cyan) */
+  color: inherit !important;
+  margin-right: 16px !important;
+}
+
+.nav-text {
+  font-size: 0.85rem;
+  letter-spacing: 0.2px;
+}
