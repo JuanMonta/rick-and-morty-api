@@ -1,17 +1,23 @@
 <div class="sidebar-container">
 
   <div class="user-profile-section">
-    <div class="avatar-wrapper">
-      <img
-        src="https://rickandmortyapi.com/api/character/avatar/1.jpeg"
-        alt="Perfil"
-        class="user-avatar"
-      />
-    </div>
-    <div class="user-info">
-      <span class="user-name">Científico Rick</span>
-      <span class="user-role">Administrador del Portal</span>
-    </div>
+    <ng-container *ngIf="{
+          user: currentUser$ | async
+      }as currentUser">
+      <div class="avatar-wrapper">
+        <app-avatar
+          [imageUrl]="currentUser.user?.avatarUrl || 'https://rickandmortyapi.com/api/character/avatar/104.jpeg'"
+          [isCircular]="true"
+          size="60px"
+        >
+        </app-avatar>
+      </div>
+      <div class="user-info">
+
+        <span class="user-name">{{currentUser.user?.name}}</span>
+        <span class="user-role">{{currentUser.user?.role}}</span>
+      </div>
+    </ng-container>
   </div>
 
   <mat-divider class="sidebar-divider"></mat-divider>
