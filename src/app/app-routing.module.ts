@@ -4,6 +4,7 @@ import { APP_ROUTES } from './core/constants/routes.dictionary';
 import { AppRoutes } from './core/models/routing.model';
 import { CharacterDashboardPageComponent } from './layout/character-dashboard/character-dashboard-page.component';
 import { AuthPortalGuard } from './core/guards/auth-portal.guard';
+import { SidebarMenuComponent } from './layout/sidebar-menu/sidebar-menu.component';
 
 export const routes: AppRoutes = [
   // Redirección Inicial Asegurada: Envía la raíz hacia la característica perezosa (Login)
@@ -31,6 +32,16 @@ export const routes: AppRoutes = [
       {
         path: APP_ROUTES.COMODINS.BLANK_PATH,
         loadChildren: () => import('./features/character/character.module').then(m => m.CharacterModule)
+      },
+      //Como CharacterDashboardPageComponent contiene HeaderComponent con html puro, al ser
+      //CharacterDashboardPageComponent el que carga todo lo visual(padre de todo lo que está dentro),
+      // al no tener el HeaderComponent un routing, por lo tanto la dueña del outlet que coloqué
+      // dentro de HeaderComponent es CharacterDashboardPageComponent.
+      // Si HeaderComponent se dibujara con o en un routing-module pues colocaría ahí esto para el outlet.
+      {
+        path: APP_ROUTES.NAVIGATION.MENU,
+        component: SidebarMenuComponent,
+        outlet: APP_ROUTES.OUTLETS.SIDEBAR
       }
     ]
   }
