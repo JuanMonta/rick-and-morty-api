@@ -1,11 +1,23 @@
 <header class="main-header">
 
+  <!-- Aplicando el patron backrop para poder cerrar el menu lateral al hacer click fuera de él -->
+  <div
+    class="sidebar-backdrop"
+    *ngIf="isSideBarOpen"
+    (click)="closeSideBar()"
+  ></div>
+
+  <aside [class.sidebar-abierto]="isSideBarOpen">
+    <router-outlet name="sidebar"></router-outlet>
+  </aside>
+
   <div class="left-section">
 
     <button
       mat-icon-button
       class="menu-button"
       title="Abrir menú lateral"
+      (click)="openSideBar()"
     >
       <mat-icon>menu</mat-icon>
     </button>

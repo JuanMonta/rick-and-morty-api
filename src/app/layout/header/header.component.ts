@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { APP_ROUTES } from 'src/app/core/constants/routes.dictionary';
 import { ApiConfigService } from 'src/app/core/services/api-config.service';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
@@ -11,14 +13,18 @@ import { CharacterFavoriteStateFacade } from 'src/app/features/character/facades
 })
 export class HeaderComponent implements OnInit {
 
+
   constructor(
+    private readonly router: Router,
+    private readonly activatedRoute: ActivatedRoute,
     private readonly authService: AuthService,
     private readonly notificationService: NotificationService,
     readonly _characterFavoriteStateService: CharacterFavoriteStateFacade,
     readonly apiConfig: ApiConfigService
   ) { }
 
-  showCharacterExtraInfo: boolean = false;
+  public showCharacterExtraInfo: boolean = false;
+  public isSideBarOpen: boolean = false;
 
   ngOnInit(): void {
   }
@@ -32,5 +38,15 @@ export class HeaderComponent implements OnInit {
     this.authService.logout();
   }
 
+  public openSideBar(): void {
+    this.isSideBarOpen = true;
+    console.log('%c[Router Outlet 🛫] Desplegando Menú panel secundario de auditoría...', 'color: #9b59b6; font-weight: bold;');
+
+  }
+
+  public closeSideBar() {
+    this.isSideBarOpen = false;
+    console.log('%c[Router Outlet 🛫] Desplegando Menú panel secundario de auditoría...', 'color: #9b59b6; font-weight: bold;');
+  }
 
 }
