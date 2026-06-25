@@ -1,0 +1,92 @@
+/* Contenedor principal a pantalla completa */
+.not-found-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #1e222b;
+  /* Color base oscuro de tu app */
+  background-image: radial-gradient(circle at center, #263238 0%, #1e222b 100%);
+  color: #ffffff;
+  text-align: center;
+  font-family: 'Roboto', sans-serif;
+  margin: 0;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Tarjeta central de contenido */
+.content-wrapper {
+  padding: 48px 32px;
+  border-radius: 16px;
+  background: rgba(30, 34, 43, 0.85);
+  /* Borde y sombra con el verde clásico de Rick y Morty */
+  border: 1px solid rgba(151, 206, 76, 0.3);
+  box-shadow: 0 8px 32px rgba(151, 206, 76, 0.15);
+  max-width: 500px;
+  width: 100%;
+}
+
+/* El número 404 */
+.error-code {
+  font-size: 120px;
+  font-weight: 900;
+  margin: 0;
+  color: #97ce4c;
+  /* Verde portal */
+  text-shadow: 0 0 20px rgba(151, 206, 76, 0.4);
+  line-height: 1;
+}
+
+/* Títulos y textos */
+.error-title {
+  font-size: 24px;
+  margin: 16px 0 8px;
+  color: #fdfafa;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.error-subtitle {
+  font-size: 16px;
+  color: #8a94a6;
+  /* Gris neutro de tu sidebar */
+  margin-bottom: 32px;
+  line-height: 1.5;
+}
+
+/* Contenedor de los botones */
+.action-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Estilos compartidos para los botones de Material */
+.action-btn {
+  padding: 4px 24px !important;
+  border-radius: 8px !important;
+  font-size: 15px !important;
+  letter-spacing: 0.5px !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Botón de regresar (Bordeado verde) */
+.back-btn {
+  color: #97ce4c !important;
+  border-color: #97ce4c !important;
+}
+
+/* Botón principal del Dashboard (Cyan de tu app) */
+.portal-btn {
+  background-color: #00b5cc !important;
+  color: #ffffff !important;
+}
+
+.portal-btn mat-icon,
+.back-btn mat-icon {
+  margin-right: 8px;
+}

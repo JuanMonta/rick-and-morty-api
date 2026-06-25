@@ -1,0 +1,32 @@
+<div class="not-found-container">
+  <div class="content-wrapper">
+    <h1 class="error-code">404</h1>
+    <h2 class="error-title">Dimensión Desconocida</h2>
+
+    <p class="error-subtitle">Parece que Rick arruinó el arma de portales...</p>
+
+    <div class="action-buttons">
+
+      <button
+        *ngIf="hasInternalHistory"
+        mat-stroked-button
+        class="action-btn back-btn"
+        (click)="goBack()"
+      >
+        <mat-icon>keyboard_return</mat-icon>
+        Regresar
+      </button>
+
+      <button
+        *ngIf="!hasInternalHistory"
+        mat-flat-button
+        class="action-btn portal-btn"
+        (click)="goBack()"
+      >
+        <mat-icon>explore</mat-icon>
+        Ir al Dashboard
+      </button>
+
+    </div>
+  </div>
+</div>
