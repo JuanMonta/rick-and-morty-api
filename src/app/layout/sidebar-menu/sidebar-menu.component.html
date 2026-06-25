@@ -1,0 +1,71 @@
+<div class="sidebar-container">
+
+  <div class="user-profile-section">
+    <div class="avatar-wrapper">
+      <img
+        src="https://rickandmortyapi.com/api/character/avatar/1.jpeg"
+        alt="Perfil"
+        class="user-avatar"
+      />
+    </div>
+    <div class="user-info">
+      <span class="user-name">Científico Rick</span>
+      <span class="user-role">Administrador del Portal</span>
+    </div>
+  </div>
+
+  <mat-divider class="sidebar-divider"></mat-divider>
+
+  <mat-nav-list class="navigation-list">
+
+    <a
+      mat-list-item
+      routerLinkActive="active-link"
+      class="nav-item"
+    >
+      <mat-icon mat-list-icon>dashboard</mat-icon>
+      <div
+        mat-line
+        class="nav-text"
+      >Dashboard</div>
+    </a>
+
+    <a
+      mat-list-item
+      routerLinkActive="active-link"
+      class="nav-item"
+    >
+      <mat-icon mat-list-icon>face</mat-icon>
+      <div
+        mat-line
+        class="nav-text"
+      >Personajes</div>
+    </a>
+
+    <a
+      mat-list-item
+      routerLinkActive="active-link"
+      class="nav-item"
+    >
+      <mat-icon mat-list-icon>shield</mat-icon>
+      <div
+        mat-line
+        class="nav-text"
+      >Auditoría</div>
+    </a>
+
+    <a
+      mat-list-item
+      routerLinkActive="active-link"
+      class="nav-item"
+    >
+      <mat-icon mat-list-icon>settings</mat-icon>
+      <div
+        mat-line
+        class="nav-text"
+      >Configuración</div>
+    </a>
+
+  </mat-nav-list>
+
+</div>

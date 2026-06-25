@@ -5,7 +5,8 @@ import { SharedModule } from 'src/app/shared/shared.module';
 
 import { HeaderComponent } from './header/header.component';
 import { FooterComponent } from './footer/footer.component';
-import { CharacterDashboardPageComponent as CharacterDashboardPageComponent } from './character-dashboard/character-dashboard-page.component';
+import { CharacterDashboardPageComponent } from './character-dashboard/character-dashboard-page.component';
+import { SidebarMenuComponent } from './sidebar-menu/sidebar-menu.component';
 
 
 
@@ -13,7 +14,8 @@ import { CharacterDashboardPageComponent as CharacterDashboardPageComponent } fr
   declarations: [
     HeaderComponent,
     FooterComponent,
-    CharacterDashboardPageComponent
+    CharacterDashboardPageComponent,
+    SidebarMenuComponent
   ],
   imports: [
     CommonModule,
