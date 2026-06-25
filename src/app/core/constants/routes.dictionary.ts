@@ -12,5 +12,14 @@ export const APP_ROUTES = {
   },
   CHARACTERS: {
     ROOT: 'characters'
+  },
+
+  NAVIGATION: {
+    MENU: 'menu'
+  },
+
+  OUTLETS: {
+    SIDEBAR: 'sidebar'
   }
+
 } as const;
