@@ -27,6 +27,8 @@ export class HeaderComponent implements OnInit {
   public isSideBarOpen: boolean = false;
 
   ngOnInit(): void {
+    //Verificar si ya teniamos abierto el sidebar menu, porque generaba un bug visual en el sidebar si no
+    this.isSideBarOpen = this.router.url.includes(APP_ROUTES.OUTLETS.SIDEBAR);
   }
 
   toggleCharacterextraInfo() {
@@ -41,14 +43,14 @@ export class HeaderComponent implements OnInit {
   public openSideBar(): void {
     this.isSideBarOpen = true;
     console.log('%c[Router Outlet 🛫] Desplegando Menú panel secundario de auditoría...', 'color: #9b59b6; font-weight: bold;');
-    this.router.navigate([{ outlets: { [APP_ROUTES.OUTLETS.SIDEBAR]: [APP_ROUTES.NAVIGATION.MENU] } }], { relativeTo: this.activatedRoute });
+    this.router.navigate([{ outlets: { [APP_ROUTES.OUTLETS.SIDEBAR]: [APP_ROUTES.NAVIGATION.MENU] } }], { relativeTo: this.activatedRoute, replaceUrl: true /* replaceUrl permite que no se haga stack de navegación de esta navigarion*/ });
 
   }
 
   public closeSideBar() {
     this.isSideBarOpen = false;
     console.log('%c[Router Outlet 🛫] Desplegando Menú panel secundario de auditoría...', 'color: #9b59b6; font-weight: bold;');
-    this.router.navigate([{ outlets: { [APP_ROUTES.OUTLETS.SIDEBAR]: null } }], { relativeTo: this.activatedRoute });
+    this.router.navigate([{ outlets: { [APP_ROUTES.OUTLETS.SIDEBAR]: null } }], { relativeTo: this.activatedRoute, replaceUrl: true });
   }
 
 }

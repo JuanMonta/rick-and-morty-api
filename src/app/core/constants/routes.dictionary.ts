@@ -10,12 +10,15 @@ export const APP_ROUTES = {
   DASHBOARD: {
     ROOT: 'dashboard'
   },
-  CHARACTERS: {
-    ROOT: 'characters'
-  },
+
 
   NAVIGATION: {
     MENU: 'menu'
+  },
+
+  ERRORS: {
+    ACCESS_DENIED: 'access-denied',
+    NOT_FOUND: '404'
   },
 
   OUTLETS: {
