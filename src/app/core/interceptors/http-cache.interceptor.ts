@@ -22,8 +22,8 @@ export class HttpCacheInterceptor implements HttpInterceptor {
 
   private cache = new Map<string, CachedResponse>();
 
-  // Definimos el tiempo de vida de la caché (ejemplo: 5 minutos en milisegundos)
-  private readonly CACHE_TTL_MS = 5 * 60 * 1000;
+  // Definimos el tiempo de vida de la caché en milisegundos
+  private readonly CACHE_TTL_MS = 1 * 60 * 1000;
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
 
@@ -42,20 +42,25 @@ export class HttpCacheInterceptor implements HttpInterceptor {
       const isExpired = (Date.now() - cachedEntry.addedTime) > this.CACHE_TTL_MS;
 
       if (isExpired) {
+        console.log(`%c[Memory Cache 🗑️] Datos caducados para: ${request.url} | Purgando entrada obsoleta.`, 'color: #e74c3c; font-weight: bold; font-style: italic;');
         // Si caducó la caché, limpiamos la basura y dejamos que la petición continúe a internet
         this.cache.delete(cachedKey);
       } else {
+        console.log(`%c[Memory Cache 🔥 HIT] Recuperando clon inmutable de RAM para: ${request.url}`, 'color: #e67e22; font-weight: bold; text-decoration: underline;');
         // Devolvemos un CLON de la respuesta.
         // Siempre usar .clone() porque los HttpResponse en Angular son inmutables
         return of(cachedEntry.response.clone());
       }
     }
 
+    console.log(`%c[Memory Cache ❄️ MISS] Sin datos locales para: ${request.url} | Derivando tráfico a la red.`, 'color: #bdc3c7; font-weight: 500;');
+
     // No está en caché o caducó, la petición sale a internet.
     return next.handle(request).pipe(
       tap((event: HttpEvent<unknown>) => {
         // Solo guardamos cuando la respuesta HTTP es exitosa y completa
         if (event instanceof HttpResponse) {
+          console.log(`%c[Memory Cache 💾 STORE] Congelando respuesta en RAM para futuras dimensiones: ${request.url}`, 'color: #f1c40f; font-weight: bold;');
           this.cache.set(request.urlWithParams, {
             response: event.clone(),
             addedTime: Date.now()
