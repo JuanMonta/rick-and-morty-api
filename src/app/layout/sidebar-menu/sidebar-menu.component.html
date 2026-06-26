@@ -1,21 +1,18 @@
 <div class="sidebar-container">
 
   <div class="user-profile-section">
-    <ng-container *ngIf="{
-          user: currentUser$ | async
-      }as currentUser">
+    <ng-container *ngIf="currentUser$ | async as user">
       <div class="avatar-wrapper">
         <app-avatar
-          [imageUrl]="currentUser.user?.avatarUrl || 'https://rickandmortyapi.com/api/character/avatar/104.jpeg'"
+          [imageUrl]="user?.avatarUrl || 'https://rickandmortyapi.com/api/character/avatar/104.jpeg'"
           [isCircular]="true"
           size="60px"
         >
         </app-avatar>
       </div>
       <div class="user-info">
-
-        <span class="user-name">{{currentUser.user?.name}}</span>
-        <span class="user-role">{{currentUser.user?.role}}</span>
+        <span class="user-name">{{user?.name}}</span>
+        <span class="user-role">{{user?.role}}</span>
       </div>
     </ng-container>
   </div>
@@ -23,55 +20,21 @@
   <mat-divider class="sidebar-divider"></mat-divider>
 
   <mat-nav-list class="navigation-list">
-
-    <a
-      mat-list-item
-      routerLinkActive="active-link"
-      class="nav-item"
-    >
-      <mat-icon mat-list-icon>dashboard</mat-icon>
-      <div
-        mat-line
-        class="nav-text"
-      >Dashboard</div>
-    </a>
-
-    <a
-      mat-list-item
-      routerLinkActive="active-link"
-      class="nav-item"
-    >
-      <mat-icon mat-list-icon>face</mat-icon>
-      <div
-        mat-line
-        class="nav-text"
-      >Personajes</div>
-    </a>
-
-    <a
-      mat-list-item
-      routerLinkActive="active-link"
-      class="nav-item"
-    >
-      <mat-icon mat-list-icon>shield</mat-icon>
-      <div
-        mat-line
-        class="nav-text"
-      >Auditoría</div>
-    </a>
-
-    <a
-      mat-list-item
-      routerLinkActive="active-link"
-      class="nav-item"
-    >
-      <mat-icon mat-list-icon>settings</mat-icon>
-      <div
-        mat-line
-        class="nav-text"
-      >Configuración</div>
-    </a>
-
+    <ng-container *ngFor="let item of menuItems$  | async">
+      <a
+        mat-list-item
+        [routerLink]="[item.route]"
+        routerLinkActive="active-link"
+        [routerLinkActiveOptions]="{exact: true}"
+        class="nav-item"
+      >
+        <mat-icon mat-list-icon>{{item.icon}}</mat-icon>
+        <div
+          mat-line
+          class="nav-text"
+        >{{item.label}}</div>
+      </a>
+    </ng-container>
   </mat-nav-list>
 
 </div>
