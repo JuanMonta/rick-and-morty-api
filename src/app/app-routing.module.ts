@@ -5,6 +5,8 @@ import { AppRoutes } from './core/models/routing.model';
 import { CharacterDashboardPageComponent } from './layout/character-dashboard/character-dashboard-page.component';
 import { AuthPortalGuard } from './core/guards/auth-portal.guard';
 import { SidebarMenuComponent } from './layout/sidebar-menu/sidebar-menu.component';
+import { AccessDeniedComponent } from './core/components/access-denied/access-denied.component';
+import { NotFoundComponent } from './core/components/not-found/not-found.component';
 
 export const routes: AppRoutes = [
   // Redirección Inicial Asegurada: Envía la raíz hacia la característica perezosa (Login)
@@ -44,6 +46,18 @@ export const routes: AppRoutes = [
         outlet: APP_ROUTES.OUTLETS.SIDEBAR
       }
     ]
+  },
+  {
+    path: APP_ROUTES.ERRORS.ACCESS_DENIED,
+    component: AccessDeniedComponent,
+    // Mutiples guards que se activarán secuencialmente segun el array, solo uno que de false se detendrá todo ahí sin proseguir con los demas guards
+    canActivate: [
+      AuthPortalGuard, // Guard para verificar si tiene authorizacion para ingresar al path
+    ],
+  },
+  {
+    path: APP_ROUTES.COMODINS.WILDCARD,
+    component: NotFoundComponent
   }
 ];
 
