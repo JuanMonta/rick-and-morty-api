@@ -21,7 +21,7 @@ export class AuthService {
   private readonly SESSION_KEY = 'CITADEL_AUTH_SESSION';
   private readonly EXPIRATION_KEY = 'CITADEL_TOKEN_EXP';
   // Un minuto
-  private readonly TOKEN_LIFESPAN_MS = 60000;
+  private readonly TOKEN_LIFESPAN_MS = 1 * 60 * 1000;
 
   private readonly currentUserSubject: BehaviorSubject<User | null> = new BehaviorSubject<User | null>(null);
   public readonly currentUser$: Observable<User | null> = this.currentUserSubject.asObservable();
