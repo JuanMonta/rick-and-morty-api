@@ -54,39 +54,3 @@
   margin-bottom: 32px;
   line-height: 1.5;
 }
-
-/* Contenedor de los botones */
-.action-buttons {
-  display: flex;
-  gap: 16px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-/* Estilos compartidos para los botones de Material */
-.action-btn {
-  padding: 4px 24px !important;
-  border-radius: 8px !important;
-  font-size: 15px !important;
-  letter-spacing: 0.5px !important;
-  display: flex !important;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Botón de regresar (Bordeado verde) */
-.back-btn {
-  color: #97ce4c !important;
-  border-color: #97ce4c !important;
-}
-
-/* Botón principal del Dashboard (Cyan de tu app) */
-.portal-btn {
-  background-color: #00b5cc !important;
-  color: #ffffff !important;
-}
-
-.portal-btn mat-icon,
-.back-btn mat-icon {
-  margin-right: 8px;
-}

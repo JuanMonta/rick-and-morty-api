@@ -1,0 +1,116 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+/* Contenedor Principal: Centrado absoluto en la pantalla */
+.access-denied-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Se adapta al espacio disponible de tu layout */
+  min-height: 100vh;
+  padding: 24px;
+  box-sizing: border-box;
+  background-color: #fafafa;
+}
+
+/* Tarjeta Corporativa */
+.access-denied-card {
+  background: #ffffff;
+  max-width: 440px;
+  width: 100%;
+  padding: 40px 32px;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 10px 15px -3px rgba(0, 0, 0, 0.03),
+    0 0 0 1px rgba(0, 0, 0, 0.04);
+  text-align: center;
+}
+
+/* Escudo/Contenedor del Icono */
+.icon-container {
+  background-color: #fef2f2;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 24px auto;
+}
+
+.lock-icon {
+  width: 28px;
+  height: 28px;
+  color: #ef4444;
+}
+
+/* Tipografías y Textos */
+h1 {
+  color: #111827;
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.025em;
+}
+
+.page-context {
+  /* Gris secundario para el contexto de la ruta */
+  color: #6b7280;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 20px 0;
+}
+
+.message {
+  color: #4b5563;
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 0 0 32px 0;
+}
+
+.message strong {
+  color: #1f2937;
+  display: block;
+  margin-top: 8px;
+  font-weight: 500;
+}
+
+/* Botón con Estilo Moderno */
+.actions-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.btn-back {
+  background-color: #1f2937;
+  color: #ffffff;
+  border: none;
+  padding: 12px 28px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.btn-back:hover {
+  /* Hover al boton al pasar el mouse */
+  background-color: #374151;
+}
+
+.btn-back:active {
+  /* Pequeño feedback físico al hacer click */
+  transform: scale(0.98);
+}
+
+.arrow-icon {
+  width: 14px;
+  height: 14px;
+}
