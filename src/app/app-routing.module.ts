@@ -1,3 +1,4 @@
+import { RolePreloadingStrategyService } from './core/services/role-preloading-strategy.service';
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { APP_ROUTES } from './core/constants/routes.dictionary';
@@ -24,7 +25,8 @@ export const routes: AppRoutes = [
     path: APP_ROUTES.DASHBOARD.ROOT,
     component: CharacterDashboardPageComponent,
     data: {
-      requiresAuth: true
+      requiresAuth: true,
+      preload: true
     },
     // Mutiples guards que se activarán secuencialmente segun el array, solo uno que de false se detendrá todo ahí sin proseguir con los demas guards
     canActivate: [
@@ -57,13 +59,15 @@ export const routes: AppRoutes = [
   },
   {
     path: APP_ROUTES.COMODINS.WILDCARD,
-    component: NotFoundComponent
+    component: NotFoundComponent,
   }
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes,
     {
+      preloadingStrategy: RolePreloadingStrategyService,
+      paramsInheritanceStrategy: 'always',
       // ACTIVACIÓN DE LA ESTRATEGIA DE HASHLOCATIONSTRATEGY
       useHash: true,
       // OPTIMIZACIÓN NATIVA DE EXPERIENCIA DE USUARIO Y SCROLLING
