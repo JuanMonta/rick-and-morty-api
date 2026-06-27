@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Params } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { APP_ROUTES } from 'src/app/core/constants/routes.dictionary';
@@ -8,8 +9,9 @@ import { AuthService } from 'src/app/core/services/auth.service';
 interface MenuItem {
   label: string;
   icon: string;
-  route: string;
+  routeCommand: (string | Params)[];
   allowedRoles: UserRole[];
+  isFeatureRoot?: boolean;
 }
 
 @Component({
@@ -25,25 +27,26 @@ export class SidebarMenuComponent implements OnInit {
     {
       label: 'Dashboard',
       icon: 'dashboard',
-      route: `/${APP_ROUTES.DASHBOARD.ROOT}`,
-      allowedRoles: [Role.ADMIN, Role.SCIENTIST, Role.GUEST]
+      routeCommand: [APP_ROUTES.DASHBOARD.ROOT],
+      allowedRoles: [Role.ADMIN, Role.SCIENTIST, Role.GUEST],
+      isFeatureRoot: true
     },
     {
       label: 'Personajes',
       icon: 'face',
-      route: `/${APP_ROUTES.ERRORS.ACCESS_DENIED}`,
+      routeCommand: [APP_ROUTES.ERRORS.NOT_FOUND],
       allowedRoles: [Role.ADMIN, Role.SCIENTIST]
     },
     {
       label: 'Auditoría',
       icon: 'shield',
-      route: `/${APP_ROUTES.ERRORS.NOT_FOUND}`,
+      routeCommand: [APP_ROUTES.ERRORS.NOT_FOUND],
       allowedRoles: [Role.ADMIN]
     },
     {
       label: 'Configuración',
       icon: 'settings',
-      route: `/${APP_ROUTES.ERRORS.ACCESS_DENIED}`,
+      routeCommand: [APP_ROUTES.ERRORS.NOT_FOUND],
       allowedRoles: [Role.ADMIN]
     }
   ]
@@ -51,14 +54,41 @@ export class SidebarMenuComponent implements OnInit {
   public menuItems$!: Observable<MenuItem[]>;
 
   constructor(
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+    private readonly activatedRoute: ActivatedRoute
   ) { }
 
   ngOnInit(): void {
+    // Leemos en qué módulo nos acaban de renderizar (dashboard, admin, etc.)
+    const parentSegment = this.activatedRoute.parent?.snapshot.url[0]?.path;
+    // Si parent existe, esto hace que tu menú sea polimórfico: funciona igual en el Dashboard,
+    // en un panel de administración, o en cualquier otra feature que se implemente en el futuro.
+    // Sino le damos un valor por defecto
+    const dynamicBasePath = parentSegment ? `/${parentSegment}` : `/${APP_ROUTES.DASHBOARD.ROOT}`;
+
     this.menuItems$ = this.currentUser$.pipe(
       map(user => {
         if (!user) return [];
-        return this.defaultMenuItems.filter(item => item.allowedRoles.includes(user.role))
+        const allowedItems = this.defaultMenuItems.filter(item => item.allowedRoles.includes(user.role));
+
+        return allowedItems.map(item => {
+          if (item.isFeatureRoot) {
+            return {
+              ...item,
+              // Reconstruimos la ruta para no aniquilar el menú
+              routeCommand: [
+                dynamicBasePath,
+                { outlets: { [APP_ROUTES.OUTLETS.SIDEBAR]: [APP_ROUTES.NAVIGATION.MENU] } }
+              ]
+            };
+          }
+
+          // Retornamos las rutas normales absolutas (agregando la barra / para evitar fallos relativos)
+          return {
+            ...item,
+            routeCommand: [`/${item.routeCommand[0]}`]
+          }
+        });
       })
     );
   }
