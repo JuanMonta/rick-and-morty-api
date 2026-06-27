@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
-import { createBaseCharacter } from 'src/app/core/adapters/api.adapter';
+import { catchError, map, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { AtributeTotal, Character } from 'src/app/core/models/api.model';
 import { CharacterRepositoryProxyService } from '../../services/character-repository-proxy.service';
 
@@ -30,9 +29,29 @@ export class CharacterListFacade {
   isLoadingInformation$: Observable<boolean> = this.isLoadingInformationSubject.asObservable();
 
   //========CONSULTA DE PERSONAJES UNO POR UNO==========================================================================
-  private readonly characterStateSubject: BehaviorSubject<Character | null> = new BehaviorSubject<Character | null>(null);
-  public readonly currentCharacter$: Observable<Character | null> = this.characterStateSubject.asObservable();
+  private isLoadingSubject = new BehaviorSubject<boolean>(false);
+  public isLoadingCharacter$: Observable<boolean> = this.isLoadingSubject.asObservable();
 
+  private characterIdActionSubject = new Subject<string | number>();
+
+  public readonly currentCharacter$: Observable<Character | null> = this.characterIdActionSubject.pipe(
+    tap(() => this.isLoadingSubject.next(true)),
+    switchMap(id => {
+      return this._characterService.getCharacterById(id).pipe(
+        tap(() => {
+          // La API respondió con éxito
+          this.isLoadingSubject.next(false);
+        }),
+        catchError(error => {
+          console.error('[Character by ID Stream Error]:', error);
+          this.isLoadingSubject.next(false);
+          return of(null); // Evita que el stream se rompa si la API falla
+        })
+      );
+    }),
+    // Mantiene el último personaje en memoria RAM para evitar repeticiones del HTML
+    shareReplay(1)
+  );
   //========CONTEO DE ESPECIES =========================================================================================
   public readonly allCharactersSubject: BehaviorSubject<Character[]> = new BehaviorSubject<Character[]>([]);
   public readonly allCharacters$: Observable<Character[]> = this.allCharactersSubject.asObservable();
@@ -111,7 +130,7 @@ export class CharacterListFacade {
 
 
   loadCharacter(id: string | number) {
-    this._characterService.getCharacterById(id).subscribe((character: Character) => this.characterStateSubject.next(character));
+    this.characterIdActionSubject.next(id);
   }
 
   public calculateTotalsByProperty(characters: Character[], property: 'species' | 'type'): AtributeTotal[] {

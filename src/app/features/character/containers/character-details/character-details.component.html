@@ -1,6 +1,6 @@
 <div class="contenedor-detalles">
   <ng-container *ngIf="{
-    isLoading : _characterDetailsFacade.isLoading$ | async,
+    isLoading : isCharacterLoading$ | async,
     characterFullDetails : character$ | async
   } as vm">
 

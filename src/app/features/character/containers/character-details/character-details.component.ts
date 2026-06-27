@@ -12,6 +12,7 @@ import { Observable } from 'rxjs';
 export class CharacterDetailsComponent implements OnInit {
 
   character$: Observable<Character | null> = this._characterDetailsFacade.currentCharacter$;
+  isCharacterLoading$: Observable<boolean> = this._characterDetailsFacade.isCharacterLoading$;
 
   constructor(
     readonly _characterDetailsFacade: CharacterDetailsFacade,
