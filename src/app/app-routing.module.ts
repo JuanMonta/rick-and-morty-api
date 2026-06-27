@@ -25,8 +25,7 @@ export const routes: AppRoutes = [
     path: APP_ROUTES.DASHBOARD.ROOT,
     component: CharacterDashboardPageComponent,
     data: {
-      requiresAuth: true,
-      preload: true
+      requiresAuth: true
     },
     // Mutiples guards que se activarán secuencialmente segun el array, solo uno que de false se detendrá todo ahí sin proseguir con los demas guards
     canActivate: [
@@ -35,7 +34,10 @@ export const routes: AppRoutes = [
     children: [
       {
         path: APP_ROUTES.COMODINS.BLANK_PATH,
-        loadChildren: () => import('./features/character/character.module').then(m => m.CharacterModule)
+        loadChildren: () => import('./features/character/character.module').then(m => m.CharacterModule),
+        data: {
+          preload: true
+        }
       },
       //Como CharacterDashboardPageComponent contiene HeaderComponent con html puro, al ser
       //CharacterDashboardPageComponent el que carga todo lo visual(padre de todo lo que está dentro),
