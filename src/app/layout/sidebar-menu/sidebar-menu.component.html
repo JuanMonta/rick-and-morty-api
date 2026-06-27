@@ -23,7 +23,7 @@
     <ng-container *ngFor="let item of menuItems$  | async">
       <a
         mat-list-item
-        [routerLink]="[item.route]"
+        [routerLink]="item.routeCommand"
         routerLinkActive="active-link"
         [routerLinkActiveOptions]="{exact: true}"
         class="nav-item"

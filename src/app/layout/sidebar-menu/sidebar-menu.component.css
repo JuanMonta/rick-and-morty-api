@@ -1,6 +1,6 @@
 /* Contenedor principal del menú lateral */
 .sidebar-container {
-  width: 260px;
+  width: 250px;
   height: 100vh;
   background-color: #1e222b;
   /* Tono oscuro complementario al header */
@@ -71,6 +71,10 @@
 .nav-item {
   height: 48px !important;
   margin: 4px 12px !important;
+  /* Le restamos los 24px del margen al 100% del ancho */
+  width: calc(100% - 24px) !important;
+  box-sizing: border-box !important;
+  /*--------------------------------*/
   border-radius: 8px !important;
   color: #8a94a6 !important;
   transition: all 0.2s ease-in-out !important;
