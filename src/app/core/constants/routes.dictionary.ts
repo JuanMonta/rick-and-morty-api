@@ -7,10 +7,14 @@ export const APP_ROUTES = {
     BLANK_PATH: '',
     WILDCARD: '**'
   },
+
   DASHBOARD: {
     ROOT: 'dashboard'
   },
 
+  WELCOME: {
+    ROOT: 'welcome'
+  },
 
   NAVIGATION: {
     MENU: 'menu'
