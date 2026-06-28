@@ -112,6 +112,12 @@ export class AuthService {
   }
 
 
+  public hasRole(roles: UserRole[]): boolean {
+    const user = this.currentUserSubject.getValue();
+    if (!user) return false;
+    return roles.includes(user.role);
+  }
+
   // Conservamos la firma exacta de tu método por compatibilidad con el SecureModuleGuard actual
   public getAuthState(): Observable<boolean> {
     return this.isAuthenticated$;

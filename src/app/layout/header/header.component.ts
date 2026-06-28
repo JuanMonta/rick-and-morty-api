@@ -53,4 +53,10 @@ export class HeaderComponent implements OnInit {
     this.router.navigate([{ outlets: { [APP_ROUTES.OUTLETS.SIDEBAR]: null } }], { relativeTo: this.activatedRoute, replaceUrl: true });
   }
 
+  public secretPortal() {
+    this.router.navigate([APP_ROUTES.WELCOME.ROOT], {
+      relativeTo: this.activatedRoute
+    });
+  }
+
 }
