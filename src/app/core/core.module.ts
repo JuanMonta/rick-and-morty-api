@@ -7,13 +7,15 @@ import { AccessDeniedComponent } from './components/access-denied/access-denied.
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { SharedModule } from '../shared/shared.module';
 import { RouterModule } from '@angular/router';
+import { WelcomeComponent } from './components/welcome/welcome.component';
 
 
 
 @NgModule({
   declarations: [
     AccessDeniedComponent,
-    NotFoundComponent
+    NotFoundComponent,
+    WelcomeComponent
   ],
   imports: [
     CommonModule,

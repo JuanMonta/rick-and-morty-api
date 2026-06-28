@@ -1,0 +1,121 @@
+.welcome-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 70vh;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.welcome-card {
+  max-width: 550px;
+  width: 100%;
+  border-radius: 12px !important;
+  background: #ffffff;
+  /* Detalle de color con el tono primary de Material */
+  border-left: 5px solid #3f51b5;
+}
+
+.welcome-icon-header mat-icon {
+  font-size: 32px;
+  height: 32px;
+  width: 32px;
+}
+
+.welcome-title {
+  font-weight: bold;
+  letter-spacing: 1px;
+  font-size: 16px;
+}
+
+.welcome-content {
+  margin-top: 24px;
+}
+
+.welcome-hero {
+  text-align: center;
+  padding: 16px 0 24px 0;
+}
+
+.hero-icon {
+  font-size: 72px;
+  height: 72px;
+  width: 72px;
+  color: #3f51b5;
+  margin-bottom: 12px;
+}
+
+.welcome-hero h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+  color: #2c3e50;
+}
+
+.welcome-hero p {
+  color: #7f8c8d;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+code {
+  background: #f4f6f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #e74c3c;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: bold;
+}
+
+.security-meta {
+  margin-top: 20px;
+  padding: 12px 4px;
+}
+
+.security-meta h3 {
+  font-size: 13px;
+  font-weight: bold;
+  color: #7f8c8d;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.role-tags {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.meta-label {
+  font-size: 13px;
+  color: #333;
+}
+
+.role-chip {
+  font-size: 11px !important;
+  font-weight: bold !important;
+  min-height: 24px !important;
+}
+
+/* Sutil animación de pulso para el ícono central */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 3s infinite ease-in-out;
+}
