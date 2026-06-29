@@ -8,7 +8,7 @@ import { AuthService } from 'src/app/core/services/auth.service';
 interface LoadCharactersTrigger {
   name: string,
   status: string,
-  page: string | number
+  page: number
 }
 
 @Injectable({
@@ -116,12 +116,34 @@ export class CharacterListFacade implements OnDestroy {
     this.loadCharactersTrigger.pipe(
       //Si entra un nuevo objeto con parámetros antes de que
       // la petición anterior termine, switchMap mata la petición HTTP anterior en la red.
-      switchMap(params => {
+      switchMap((params: LoadCharactersTrigger) => {
         // Guardamos la página actual de forma síncrona preventiva
         this.currentPageSubject.next(Number(params.page));
         this.isLoadingInformationSubject.next(true);
         // Retornamos la consulta al repositorio para que switchMap la controle
         return this._characterService.getCharacters(params.page, params.name, params.status).pipe(
+          // tap() es el lugar correcto para efectos secundarios y mutación de estado
+          tap(response => {
+            const totalPages: number = Number(response.info?.pages) ?? 1;
+            this.totalPagesSubject.next(totalPages);
+
+            const incomingCharacters: Character[] = response.results;
+            this.paginationCharactersSubject.next(incomingCharacters);
+            this.isLoadingInformationSubject.next(false);
+
+            // LLENADO DE LA VARIABLE QUE POSTERIORMENT HACE LOS CALCULOS DE SPCIES Y TYPE
+            let currentCharacters: Character[] = this.allCharactersSubject.getValue();
+            // Filtramos los nuevos personajes dejando pasar solo aquellos cuyo ID NO exista en la lista histórica
+            const uniqueCharacters = incomingCharacters.filter(incomingChar =>
+              // Usamos coerción explícita segura y triple igualdad (===)
+              !currentCharacters.some(existingChar => String(existingChar.id) === String(incomingChar.id))
+            )
+            this.allCharactersSubject.next([...currentCharacters, ...uniqueCharacters]);
+            /* console.log(
+              `[RAM Audit] Histórico previo: ${currentCharacters.length} | Nuevos detectados: ${incomingCharacters.length} | Insertados únicos: ${uniqueCharacters.length}`
+            );
+            console.log('[Contenido Total RAM]', this.allCharactersSubject.getValue()); */
+          }),
           // ¡ESCUDO! Si esta petición específica falla, todo fallará para siempre hasta que se cargue la página,
           // por ello retornamos un objeto vacío y el flujo principal (loadCharactersTrigger) NO muere.
           catchError(error => {
@@ -130,27 +152,9 @@ export class CharacterListFacade implements OnDestroy {
             return of({ info: null, results: [] })
           })
         );
-      })
-    ).subscribe(response => {
-      const totalPages: number = (response.info?.pages) ?? 1;
-      this.totalPagesSubject.next(totalPages);
-
-      const incomingCharacters: Character[] = response.results;
-      this.paginationCharactersSubject.next(incomingCharacters);
-      this.isLoadingInformationSubject.next(false);
-
-      // LLENADO DE LA VARIABLE QUE POSTERIORMENT HACE LOS CALCULOS DE SPCIES Y TYPE
-      let currentCharacters: Character[] = this.allCharactersSubject.getValue();
-      // Filtramos los nuevos personajes dejando pasar solo aquellos cuyo ID NO exista en la lista histórica
-      const uniqueCharacters = incomingCharacters.filter(incomingChar =>
-        !currentCharacters.some(existingChar => String(existingChar.id) === String(incomingChar.id))
-      )
-      this.allCharactersSubject.next([...currentCharacters, ...uniqueCharacters]);
-      /* console.log(
-        `[RAM Audit] Histórico previo: ${currentCharacters.length} | Nuevos detectados: ${incomingCharacters.length} | Insertados únicos: ${uniqueCharacters.length}`
-      );
-      console.log('[Contenido Total RAM]', this.allCharactersSubject.getValue()); */
-    });
+      }),
+      takeUntil(this.destroy$)// Corta la suscripción automáticamente al destruir el servicio
+    ).subscribe();
   }
 
   //=======================================================================================================================
@@ -158,7 +162,7 @@ export class CharacterListFacade implements OnDestroy {
   /**
    * Obtener personajes usando pahinación y filtros.
    */
-  loadCharacters(updateCurrentPage: string | number, characterName: string, characterStatus: string) {
+  loadCharacters(updateCurrentPage: number, characterName: string, characterStatus: string) {
     this.loadCharactersTrigger.next({ name: characterName, status: characterStatus, page: updateCurrentPage });
   }
 
