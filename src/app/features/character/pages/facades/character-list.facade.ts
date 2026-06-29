@@ -1,8 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
-import { catchError, map, shareReplay, switchMap, tap } from 'rxjs/operators';
+import { catchError, distinctUntilChanged, map, shareReplay, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { AtributeTotal, Character } from 'src/app/core/models/api.model';
 import { CharacterRepositoryProxyService } from '../../services/character-repository-proxy.service';
+import { AuthService } from 'src/app/core/services/auth.service';
 
 interface LoadCharactersTrigger {
   name: string,
@@ -13,38 +14,70 @@ interface LoadCharactersTrigger {
 @Injectable({
   providedIn: 'root',
 })
-export class CharacterListFacade {
+export class CharacterListFacade implements OnDestroy {
 
   constructor(
+    private readonly _authService: AuthService,
     private readonly _characterService: CharacterRepositoryProxyService,
   ) {
+    // Para el logout de usuario, cuando acabe la sesion del usuario
+    // ya sea por expiracion o logout tradicional, borraremos todos los
+    // behavior subject porque los datos quedan almancenados aún,
+    // y toca eliminarlo o se cargarán en otro loggin mostrando datos,
+    // algo que no se debe hacer.
+    this._authService.currentUser$.pipe(
+      takeUntil(this.destroy$), // Corta la suscripción automáticamente al destruir el servicio
+      tap(user => {
+        if (!user) {
+          //console.log('%c[RAM Audit 🧹] Purgando estado del Facade por cierre de sesión', 'color: #e67e22;');
+          this.clearState();
+        }
+      })
+    ).subscribe();
     this.initLoadCharactersTrigger();
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    console.log('%c[RAM Audit 🛡️] CharacterFacadeService destruido. Memory Leaks prevenidos.', 'color: #27ae60;');
+  }
+
+  private clearState(): void {
+    this.isLoadingInformationSubject.next(false);
+    this.isLoadingCharacterSubject.next(false);
+    this.allCharactersSubject.next([]);
+    this.paginationCharactersSubject.next([]);
+    this.currentPageSubject.next(1);
+    this.totalPagesSubject.next(1);
+  }
 
   private readonly localCharacterTotalsInfoKey = 'charactersTotals';
   private readonly locaCharacterTotalsDate = 'charactersTotalsDate';
+
+  // Subject dedicado exclusivamente a matar suscripciones
+  private readonly destroy$: Subject<void> = new Subject<void>();
 
   private isLoadingInformationSubject = new BehaviorSubject<boolean>(false);
   isLoadingInformation$: Observable<boolean> = this.isLoadingInformationSubject.asObservable();
 
   //========CONSULTA DE PERSONAJES UNO POR UNO==========================================================================
-  private isLoadingSubject = new BehaviorSubject<boolean>(false);
-  public isLoadingCharacter$: Observable<boolean> = this.isLoadingSubject.asObservable();
+  private isLoadingCharacterSubject = new BehaviorSubject<boolean>(false);
+  public isLoadingCharacter$: Observable<boolean> = this.isLoadingCharacterSubject.asObservable();
 
   private characterIdActionSubject = new Subject<string | number>();
 
   public readonly currentCharacter$: Observable<Character | null> = this.characterIdActionSubject.pipe(
-    tap(() => this.isLoadingSubject.next(true)),
+    tap(() => this.isLoadingCharacterSubject.next(true)),
     switchMap(id => {
       return this._characterService.getCharacterById(id).pipe(
         tap(() => {
           // La API respondió con éxito
-          this.isLoadingSubject.next(false);
+          this.isLoadingCharacterSubject.next(false);
         }),
         catchError(error => {
           console.error('[Character by ID Stream Error]:', error);
-          this.isLoadingSubject.next(false);
+          this.isLoadingCharacterSubject.next(false);
           return of(null); // Evita que el stream se rompa si la API falla
         })
       );
@@ -54,7 +87,7 @@ export class CharacterListFacade {
   );
   //========CONTEO DE ESPECIES =========================================================================================
   public readonly allCharactersSubject: BehaviorSubject<Character[]> = new BehaviorSubject<Character[]>([]);
-  public readonly allCharacters$: Observable<Character[]> = this.allCharactersSubject.asObservable();
+  public readonly allCharacters$: Observable<Character[]> = this.allCharactersSubject.asObservable().pipe(distinctUntilChanged());
 
   public readonly speciesTotals$: Observable<AtributeTotal[]> = this.allCharacters$.pipe(
     map(characters => this.calculateTotalsByProperty(characters, 'species'))
@@ -92,24 +125,25 @@ export class CharacterListFacade {
           // ¡ESCUDO! Si esta petición específica falla, todo fallará para siempre hasta que se cargue la página,
           // por ello retornamos un objeto vacío y el flujo principal (loadCharactersTrigger) NO muere.
           catchError(error => {
-            console.error('[RAM Audit] Fallo al cargar personajes:', error);
+            console.error('[RAM Audit 🚨] Fallo al cargar personajes:', error);
             this.isLoadingInformationSubject.next(false);
             return of({ info: null, results: [] })
           })
         );
       })
     ).subscribe(response => {
-      this.totalPagesSubject.next((response.info?.pages) ?? 1);
+      const totalPages: number = (response.info?.pages) ?? 1;
+      this.totalPagesSubject.next(totalPages);
 
-      const incomingCharacters = response.results;
+      const incomingCharacters: Character[] = response.results;
       this.paginationCharactersSubject.next(incomingCharacters);
       this.isLoadingInformationSubject.next(false);
 
       // LLENADO DE LA VARIABLE QUE POSTERIORMENT HACE LOS CALCULOS DE SPCIES Y TYPE
-      let currentCharacters = this.allCharactersSubject.getValue();
+      let currentCharacters: Character[] = this.allCharactersSubject.getValue();
       // Filtramos los nuevos personajes dejando pasar solo aquellos cuyo ID NO exista en la lista histórica
       const uniqueCharacters = incomingCharacters.filter(incomingChar =>
-        !currentCharacters.some(existingChar => existingChar.id == incomingChar.id)
+        !currentCharacters.some(existingChar => String(existingChar.id) === String(incomingChar.id))
       )
       this.allCharactersSubject.next([...currentCharacters, ...uniqueCharacters]);
       /* console.log(
