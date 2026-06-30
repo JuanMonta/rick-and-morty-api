@@ -59,19 +59,19 @@ export function characterRestDtoToCharacter(dto: CharacterRestDTO): Character {
   })
 }
 
+const getResidentName = (residents: ResidentGraphqlDTO[] | undefined, currentId: string) => {
+  if (!residents || residents.length === 0) {
+    return 'No tiene residentes'
+  }
+  const resident = residents.find((r: ResidentGraphqlDTO) => String(r.id) !== currentId);
+  return resident ? resident.name : 'No tiene residentes'
+};
+
 /**
  * Transforma un payload de la API GraphQL al modelo de Dominio Unificado.
  */
 export function characterGraphQlDtoToCharacter(dto: CharacterGraphQLDTO): Character {
   const currentId = String(dto.id);
-
-  const getResidentName = (residents: ResidentGraphqlDTO[]) => {
-    if (!residents || residents.length === 0) {
-      return 'No tiene residentes'
-    }
-    const resident = residents.find((r: ResidentGraphqlDTO) => String(r.id) !== currentId);
-    return resident ? resident.name : 'No tiene residentes'
-  };
 
   //* Para este caso devolvemos solo las propiedades que hemos querido traer usando Graphql
   //* y usando el mappeador mantenemos completas las propiedades que aquí nos faltan del modelo base que seria Character.
@@ -87,15 +87,15 @@ export function characterGraphQlDtoToCharacter(dto: CharacterGraphQLDTO): Charac
       name: dto.origin.name ?? 'unknown',
       url: '',
       dimension: dto.origin.dimension ?? 'unknown',
-      residentName: getResidentName(dto.origin.residents)
+      residentName: getResidentName(dto.origin.residents, currentId)
     },
     location: {
       name: dto.location.name ?? 'unknown',
       url: '',
       dimension: dto.location.dimension ?? 'unknown',
-      residentName: getResidentName(dto.location.residents)
+      residentName: getResidentName(dto.location.residents, currentId)
     },
     // Extraemos de forma segura el primer episodio del array para cumplir con la prueba técnica
-    episode: dto.episode && dto.episode.length > 0 ? dto.episode[0] : { name: 'No posee episodios' }
+    episode: dto.episode?.[0] ?? { name: 'No posee episodios' }
   })
 }
