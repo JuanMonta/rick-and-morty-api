@@ -34,7 +34,11 @@ export class ApiAuditInterceptor implements HttpInterceptor {
       this.router.navigate(['/', APP_ROUTES.AUTH.LOGIN]);
 
       // Cortamos el flujo reactivo inmediatamente lanzando un error interno
-      return throwError(() => new Error('CITADEL_ERROR: Local Session Expired'));
+      return throwError(() => new HttpErrorResponse({
+        error: 'CITADEL_ERROR: Local Session Expired',
+        status: 401,
+        statusText: 'Unauthorized'
+      }));
     }
 
     // Iniciamos el cronómetro de auditoría
@@ -78,8 +82,8 @@ export class ApiAuditInterceptor implements HttpInterceptor {
           this.router.navigate(['/', APP_ROUTES.AUTH.LOGIN]);
         }
 
-        // Obligatorio: Propagar el error para que la cadena reactiva no se rompa silenciosamente
-        return throwError(error);
+        // Obligatorio: Propagar el error HttpErrorResponse para que la cadena reactiva no se rompa silenciosamente
+        return throwError(() => error);
       })
     );
   }
