@@ -1,8 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Subject, combineLatest } from 'rxjs';
-import { debounceTime, distinctUntilChanged, filter, map, startWith } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, filter, map, startWith, takeUntil } from 'rxjs/operators';
 import { CharacterListFacade } from '../../pages/facades/character-list.facade';
+import { CharacterFavoriteStateFacade } from '../../facades/character-favorite-state.facade';
+import { Character } from 'src/app/core/models/api.model';
 
 @Component({
   selector: 'app-character-page',
@@ -10,14 +12,15 @@ import { CharacterListFacade } from '../../pages/facades/character-list.facade';
   styleUrls: ['./character-page.component.css'],
 })
 export class CharacterPageComponent implements OnInit, OnDestroy {
-  private destroySuscription = new Subject<void>();
+  private destroySuscription$ = new Subject<void>();
 
   searchByName = new FormControl('');
   searchByStatus = new FormControl('');
 
 
   constructor(
-    readonly _characterListFacade: CharacterListFacade
+    readonly _characterListFacade: CharacterListFacade,
+    readonly _characterFavoriteFacade: CharacterFavoriteStateFacade
   ) { }
 
   ngOnInit(): void {
@@ -49,13 +52,23 @@ export class CharacterPageComponent implements OnInit, OnDestroy {
     );
 
     // combineLatest siempre usará el último valor que logró pasar los filtros arriba
-    combineLatest([filterName, filterStatus]).subscribe(([name, status]) => {
+    combineLatest([filterName, filterStatus]).pipe(
+      takeUntil(this.destroySuscription$)
+    ).subscribe(([name, status]) => {
       this._characterListFacade.loadCharacters(1, name, status);
     });
   }
 
+  onToggleFavorite(character: Character): void {
+    this._characterFavoriteFacade.setToggleFavoriteCharacter(character);
+  }
+
+  onSelectCharacter(character: Character): void {
+    this._characterListFacade.loadCharacter(character.id);
+  }
+
   ngOnDestroy() {
-    this.destroySuscription.next(); // Cortar todas las suscripciones al instante
-    this.destroySuscription.complete(); // Limpiar
+    this.destroySuscription$.next(); // Cortar todas las suscripciones al instante
+    this.destroySuscription$.complete(); // Limpiar
   }
 }
