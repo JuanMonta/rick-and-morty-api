@@ -29,7 +29,7 @@ export class CharacterRepositoryProxyService implements CharacterRepository {
     return this.apiMode.getCharacterById(characterId);
   }
 
-  getCharacters(pageNumber: string | number, characterName: string, characterStatus: string): Observable<PaginatedCharacters> {
+  getCharacters(pageNumber: number, characterName: string, characterStatus: string): Observable<PaginatedCharacters> {
     return this.apiMode.getCharacters(pageNumber, characterName, characterStatus);
   }
 

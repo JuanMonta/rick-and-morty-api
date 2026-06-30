@@ -93,12 +93,13 @@ export class CharacterRestService implements CharacterRepository {
     );
   }
 
-  getCharacters(pageNumber: string | number = 1, characterName: string = '', characterStatus: string = ''): Observable<PaginatedCharacters> {
-    let httpParams = new HttpParams().set('page', pageNumber);
-    if (characterName.length > 0) {
+  getCharacters(pageNumber: number = 1, characterName: string = '', characterStatus: string = ''): Observable<PaginatedCharacters> {
+    let httpParams = new HttpParams().set('page', String(pageNumber));
+
+    if (characterName && characterName.length > 0) {
       httpParams = httpParams.set('name', characterName);
     }
-    if (characterName.length > 0) {
+    if (characterStatus && characterStatus.length > 0) {
       httpParams = httpParams.set('status', characterStatus);
     }
 

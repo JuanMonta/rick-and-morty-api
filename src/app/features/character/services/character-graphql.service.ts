@@ -104,14 +104,14 @@ export class CharacterGraphqlService implements CharacterRepository {
 
   getCharacterById(id: string | number): Observable<Character> {
 
-    return this.apollo.watchQuery<CharacterGraphQLResponse>({
+    return this.apollo.query<CharacterGraphQLResponse>({
       query: GET_CHARACTER_BY_ID,
       variables: {
         id: id
       },
       errorPolicy: 'all', // Permite a Apollo procesar errores sin colapsar de inmediato
       fetchPolicy: 'cache-first' // Le decimos a Apollo: "Busca en tu memoria RAM primero. Si no está, ve a la red".
-    }).valueChanges.pipe(
+    }).pipe(
       take(1),
       map(result => {
         const graphqlDto = result.data?.character;
@@ -123,8 +123,8 @@ export class CharacterGraphqlService implements CharacterRepository {
     );
   }
 
-  getCharacters(pageNumber: string | number = 1, characterName: string = '', characterStatus: string = ''): Observable<PaginatedCharacters> {
-    return this.apollo.watchQuery<CharactersGraphQLResponse>(
+  getCharacters(pageNumber: number = 1, characterName: string = '', characterStatus: string = ''): Observable<PaginatedCharacters> {
+    return this.apollo.query<CharactersGraphQLResponse>(
       {
         query: GET_CHARACTERS,
         variables: {
@@ -135,7 +135,7 @@ export class CharacterGraphqlService implements CharacterRepository {
         errorPolicy: 'all', // Permite a Apollo procesar errores sin colapsar de inmediato
         fetchPolicy: 'cache-first' // Le decimos a Apollo: "Busca en tu memoria RAM primero. Si no está, ve a la red".
       }
-    ).valueChanges.pipe(
+    ).pipe(
       take(1),
       map(results => {
         const paginatedResults = results.data?.characters;
@@ -145,6 +145,7 @@ export class CharacterGraphqlService implements CharacterRepository {
         return { info: paginatedResults.info, results: paginatedResults.results.map(char => characterGraphQlDtoToCharacter(char)) }
       }),
       catchError(error => {
+        console.error('[GraphQL Audit 🚨] Fallo en la consulta:', error);
         return of({ info: null, results: [] })
       })
     );
