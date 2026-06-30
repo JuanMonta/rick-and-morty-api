@@ -48,6 +48,10 @@
       <app-character-table
         [characters]="pagination.listCharacters"
         [isLoading]="pagination.isLoadingInformation"
+        [favoriteCharacterId]="(_characterFavoriteFacade.favoriteCharacter$ | async)?.id"
+        [selectedCharacterId]="(_characterListFacade.currentCharacter$ | async)?.id"
+        (toggleFavorite)="onToggleFavorite($event)"
+        (selectCharacter)="onSelectCharacter($event)"
       ></app-character-table>
 
       <div class="paginacion-container">
