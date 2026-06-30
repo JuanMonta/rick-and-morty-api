@@ -1,11 +1,12 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { Character } from 'src/app/core/models/api.model';
 
 @Component({
   selector: 'app-character-table',
   templateUrl: './character-table.component.html',
-  styleUrls: ['./character-table.component.css']
+  styleUrls: ['./character-table.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CharacterTableComponent implements OnInit {
 
