@@ -31,7 +31,6 @@ export class ApiAuditInterceptor implements HttpInterceptor {
 
       //this.notificationService.showError('Violación de Seguridad: Tu sesión ha expirado.');
       this.authService.logout();
-      this.router.navigate(['/', APP_ROUTES.AUTH.LOGIN]);
 
       // Cortamos el flujo reactivo inmediatamente lanzando un error interno
       return throwError(() => new HttpErrorResponse({
@@ -79,7 +78,7 @@ export class ApiAuditInterceptor implements HttpInterceptor {
         if (error instanceof HttpErrorResponse && (error.status === 401 || error.status === 403)) {
           this.notificationService.showError('Violación de Seguridad: Tu sesión ha expirado o fue revocada por la Ciudadela.');
           this.authService.logout();
-          this.router.navigate(['/', APP_ROUTES.AUTH.LOGIN]);
+          this.router.navigate(['/', APP_ROUTES.AUTH.LOGIN], { replaceUrl: true });
         }
 
         // Obligatorio: Propagar el error HttpErrorResponse para que la cadena reactiva no se rompa silenciosamente

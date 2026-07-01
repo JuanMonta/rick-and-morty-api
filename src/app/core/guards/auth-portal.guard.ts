@@ -20,17 +20,27 @@ export class AuthPortalGuard implements CanActivate {
 
   }
 
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
     // para simular que la ruta require autenticación/está alguien autorizado a acceder a esa ruta
     const needsAuthentication: boolean = (route.data as RouteMetadata).requiresAuth ?? false;
-    // para simular si el usuario está loggeado para autenticarlo y acceder a la ruta
+
+    // Evitamos suscribirnos a RxJS si el disco duro ya delata que la sesión expiró
+    if (needsAuthentication && this.authService.isSessionExpired()) {
+      this.notificationService.showWarning('Sesión Expirada. La Ciudadela exige nueva autenticación.');
+      this.router.navigate(['/', APP_ROUTES.AUTH.LOGIN], { replaceUrl: true });
+      return false;
+    }
+    // para verificar si el usuario está loggeado para autenticarlo y acceder a la ruta
     return this.authService.isAuthenticated$.pipe(
-      take(1),
+      take(1),// Obligatorio: Cierra el hilo instantáneamente tras leer el primer valor
       tap((isLogged: boolean) => {
         if (needsAuthentication && !isLogged) {
           this.notificationService.showWarning('Sesión Caducada o Inválida. Por favor reautentíquese.');
-          this.router.navigate(['/', APP_ROUTES.AUTH.LOGIN]);
+          this.router.navigate(['/', APP_ROUTES.AUTH.LOGIN], { replaceUrl: true });
+          return false;
         }
+        // Si no requiere auth, o si está logueado, damos luz verde
+        return true;
       })
     );
   }

@@ -110,7 +110,7 @@ export class AuthService {
     this.currentUserSubject.next(null);
     // Cerramos compuertas auxiliares (outlet)
     this.router.navigate([{ outlets: { sidebar: null } }]);
-    this.router.navigate(['/', APP_ROUTES.AUTH.LOGIN]);
+    this.router.navigate(['/', APP_ROUTES.AUTH.LOGIN], { replaceUrl: true });
   }
 
 
