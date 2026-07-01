@@ -8,6 +8,7 @@ import { AuthPortalGuard } from './core/guards/auth-portal.guard';
 import { SidebarMenuComponent } from './layout/sidebar-menu/sidebar-menu.component';
 import { AccessDeniedComponent } from './core/components/access-denied/access-denied.component';
 import { NotFoundComponent } from './core/components/not-found/not-found.component';
+import { PublicPortalGuard } from './core/guards/public-portal.guard';
 
 export const routes: AppRoutes = [
   // Redirección Inicial Asegurada: Envía la raíz hacia la característica perezosa (Login)
@@ -19,7 +20,8 @@ export const routes: AppRoutes = [
   // Ruta para el Módulo de Autenticación (Carga Perezosa)
   {
     path: APP_ROUTES.AUTH.LOGIN,
-    loadChildren: () => import('./features/auth/auth.module').then(m => m.AuthModule)
+    loadChildren: () => import('./features/auth/auth.module').then(m => m.AuthModule),
+    canActivate: [PublicPortalGuard]
   },
   {
     path: APP_ROUTES.DASHBOARD.ROOT,
