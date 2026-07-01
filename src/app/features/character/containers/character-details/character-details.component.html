@@ -1,8 +1,5 @@
 <div class="contenedor-detalles">
-  <ng-container *ngIf="{
-    isLoading : isCharacterLoading$ | async,
-    characterFullDetails : character$ | async
-  } as vm">
+  <ng-container *ngIf="vm$ | async as vm">
 
     <div
       class="loading-wrapper"
