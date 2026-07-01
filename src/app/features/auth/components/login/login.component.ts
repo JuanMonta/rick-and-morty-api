@@ -44,7 +44,7 @@ export class LoginComponent implements OnInit {
 
     if (loginSuccess) {
       this.notificationService.showSuccess('Identidad Confirmada. Bienvenido a la Ciudadela.');
-      this.router.navigate(['/', APP_ROUTES.DASHBOARD.ROOT]); // Redirección instantánea autorizada
+      this.router.navigate(['/', APP_ROUTES.DASHBOARD.ROOT], { replaceUrl: true }); // Redirección instantánea autorizada
     } else {
       this.notificationService.showError('Acceso Denegado: Credenciales no registradas en este universo.');
     }
