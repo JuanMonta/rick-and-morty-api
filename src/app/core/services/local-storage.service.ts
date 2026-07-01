@@ -7,54 +7,75 @@ export class LocalStorageService {
 
   constructor() { }
 
-  setItem(key: string, value: string): boolean {
+  /**
+   * Guarda un elemento en el disco de manera segura.
+   * @param key Clave del diccionario
+   * @param value Valor a almacenar (se serializará automáticamente)
+   */
+  setItem<T>(key: string, value: T): void {
     try {
-      localStorage.setItem(key, value);
-      return true;
+      const serializedValue = JSON.stringify(value)
+      localStorage.setItem(key, serializedValue);
     } catch (error) {
-      return false;
+      console.error(`[Storage Audit 🚨] Fallo crítico al guardar en disco la llave: ${key}`, error);
+      if (this.isQuotaExceeded(error)) {
+        console.error('El almacenamiento del navegador está lleno.');
+        // Aquí se pondrían el NotificationService para avisar al usuario
+      }
     }
   }
 
-  getItem(key: string): string | null {
+  /**
+   * Recupera y parsea un elemento del disco fuertemente tipado.
+   */
+  public getItem<T>(key: string): T | null {
     try {
-      return localStorage.getItem(key);
+      const item = localStorage.getItem(key);
+      return item ? (JSON.parse(item) as T) : null;
     } catch (error) {
+      console.error(`[Storage Audit 🚨] Fallo al leer o parsear la llave: ${key}`, error);
       return null;
     }
   }
 
-  removeItem(key: string): boolean {
+  public removeItem(key: string): void {
     try {
       localStorage.removeItem(key);
-      return true;
     } catch (error) {
-      return false;
+      console.error(`[Storage Audit 🚨] Fallo al eliminar la llave: ${key}`, error);
     }
   }
 
-  setObject(key: string, value: any): boolean {
+  public clearAll(): void {
     try {
-      const jsonValue = JSON.stringify(value);
-      this.setItem(key, jsonValue);
-      return true;
+      localStorage.clear();
     } catch (error) {
-      return false;
+      console.error('[Storage Audit 🚨] Fallo al limpiar el disco entero.', error);
     }
   }
 
-  getObject<T>(key: string): T | null {
-    try {
-
-      const jsonValue = this.getItem(key);
-      if (jsonValue) {
-        return JSON.parse(jsonValue) as T;
+  // Utilidad para detectar si el error fue por falta de espacio
+  private isQuotaExceeded(e: any): boolean {
+    let quotaExceeded = false;
+    if (e) {
+      if (e.code) {
+        switch (e.code) {
+          case 22:
+            quotaExceeded = true;
+            break;
+          case 1014:
+            // Firefox
+            if (e.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
+              quotaExceeded = true;
+            }
+            break;
+        }
+      } else if (e.number === -2147024882) {
+        // IE8
+        quotaExceeded = true;
       }
-      return null;
-
-    } catch (error) {
-      return null;
     }
+    return quotaExceeded;
   }
 
 }
