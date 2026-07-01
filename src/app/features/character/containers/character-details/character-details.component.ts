@@ -1,21 +1,35 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CharacterDetailsFacade } from '../../facades/character-details.facade';
 import { Character } from 'src/app/core/models/api.model';
-import { Observable } from 'rxjs';
+import { combineLatest, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
+interface CharacterDetailsViewModel {
+  isLoading: boolean;
+  characterFullDetails: Character | null;
+}
 
 @Component({
   selector: 'app-character-details',
   templateUrl: './character-details.component.html',
-  styleUrls: ['./character-details.component.css']
+  styleUrls: ['./character-details.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CharacterDetailsComponent implements OnInit {
 
-  character$: Observable<Character | null> = this._characterDetailsFacade.currentCharacter$;
-  isCharacterLoading$: Observable<boolean> = this._characterDetailsFacade.isCharacterLoading$;
+  // Orquestamos el estado reactivo en TypeScript, no en el HTML
+  public readonly vm$: Observable<CharacterDetailsViewModel> = combineLatest([
+    this._characterDetailsFacade.isCharacterLoading$,
+    this._characterDetailsFacade.currentCharacter$
+  ]).pipe(
+    map(([isLoading, characterFullDetails]) => ({
+      isLoading,
+      characterFullDetails
+    }))
+  );
 
   constructor(
-    readonly _characterDetailsFacade: CharacterDetailsFacade,
+    private readonly _characterDetailsFacade: CharacterDetailsFacade,
   ) { }
 
   ngOnInit(): void {
