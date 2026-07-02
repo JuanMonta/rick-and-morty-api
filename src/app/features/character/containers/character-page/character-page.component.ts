@@ -1,22 +1,19 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { Subject, combineLatest } from 'rxjs';
-import { debounceTime, distinctUntilChanged, filter, map, startWith, takeUntil } from 'rxjs/operators';
-import { CharacterListFacade } from '../../pages/facades/character-list.facade';
-import { CharacterFavoriteStateFacade } from '../../facades/character-favorite-state.facade';
+import { Component, OnInit } from '@angular/core';
 import { Character } from 'src/app/core/models/api.model';
+import { FilterCriteria } from 'src/app/shared/components/character-filter/character-filter.component';
+import { CharacterFavoriteStateFacade } from '../../facades/character-favorite-state.facade';
+import { CharacterListFacade } from '../../pages/facades/character-list.facade';
 
 @Component({
   selector: 'app-character-page',
   templateUrl: './character-page.component.html',
   styleUrls: ['./character-page.component.css'],
 })
-export class CharacterPageComponent implements OnInit, OnDestroy {
-  private destroySuscription$ = new Subject<void>();
+export class CharacterPageComponent implements OnInit {
 
-  searchByName = new FormControl('');
-  searchByStatus = new FormControl('');
-
+  // Guardamos las últimas referencias para la paginación reactiva
+  // Al cargarse, el componente de filtros emitirá sus valores iniciales ('', '') gatillando la primera carga automáticamente.
+  private currentCriteria: FilterCriteria = { name: '', status: '' };
 
   constructor(
     readonly _characterListFacade: CharacterListFacade,
@@ -24,40 +21,22 @@ export class CharacterPageComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    this.filtros();
+
+  }
+
+  public onFilterCriteriaChange(criteria: FilterCriteria): void {
+    this.currentCriteria = criteria;
+    this._characterListFacade.loadCharacters(1, criteria.name, criteria.status);
   }
 
   onPageChange(page: number): void {
     this._characterListFacade.loadCharacters(
       page,
-      this.searchByName.value,
-      this.searchByStatus.value
+      this.currentCriteria.name,
+      this.currentCriteria.status
     );
   }
 
-  private filtros() {
-    const filterName = this.searchByName.valueChanges.pipe(
-      debounceTime(500),
-      startWith(''),
-      //eliminar los espacios vacios al principio y final de una palabra
-      map(value => (value || '').trim()),
-      distinctUntilChanged(),
-      // dejamos pasar el valor si está vacío o si tiene 3+ letras
-      filter(value => value.length === 0 || value.length >= 3)
-    );
-
-    const filterStatus = this.searchByStatus.valueChanges.pipe(
-      startWith(''),
-      distinctUntilChanged(),
-    );
-
-    // combineLatest siempre usará el último valor que logró pasar los filtros arriba
-    combineLatest([filterName, filterStatus]).pipe(
-      takeUntil(this.destroySuscription$)
-    ).subscribe(([name, status]) => {
-      this._characterListFacade.loadCharacters(1, name, status);
-    });
-  }
 
   onToggleFavorite(character: Character): void {
     this._characterFavoriteFacade.setToggleFavoriteCharacter(character);
@@ -67,8 +46,5 @@ export class CharacterPageComponent implements OnInit, OnDestroy {
     this._characterListFacade.loadCharacter(character.id);
   }
 
-  ngOnDestroy() {
-    this.destroySuscription$.next(); // Cortar todas las suscripciones al instante
-    this.destroySuscription$.complete(); // Limpiar
-  }
+
 }

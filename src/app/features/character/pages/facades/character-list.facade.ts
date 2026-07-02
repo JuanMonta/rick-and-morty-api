@@ -20,6 +20,19 @@ export class CharacterListFacade implements OnDestroy {
     private readonly _authService: AuthService,
     private readonly _characterService: CharacterRepositoryProxyService,
   ) {
+
+    this.initLoadCharactersTrigger();
+    this.initLoadSingleCharacterTrigger();
+    this.initAuthCleaningObserver();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    console.log('%c[RAM Audit 🛡️] CharacterFacadeService destruido. Memory Leaks prevenidos.', 'color: #27ae60;');
+  }
+
+  private initAuthCleaningObserver(): void {
     // Para el logout de usuario, cuando acabe la sesion del usuario
     // ya sea por expiracion o logout tradicional, borraremos todos los
     // behavior subject porque los datos quedan almancenados aún,
@@ -34,13 +47,6 @@ export class CharacterListFacade implements OnDestroy {
         }
       })
     ).subscribe();
-    this.initLoadCharactersTrigger();
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-    console.log('%c[RAM Audit 🛡️] CharacterFacadeService destruido. Memory Leaks prevenidos.', 'color: #27ae60;');
   }
 
   private clearState(): void {
@@ -50,6 +56,7 @@ export class CharacterListFacade implements OnDestroy {
     this.paginationCharactersSubject.next([]);
     this.currentPageSubject.next(1);
     this.totalPagesSubject.next(1);
+    this.currentCharacterSubject.next(null);
   }
 
   private readonly localCharacterTotalsInfoKey = 'charactersTotals';
@@ -66,25 +73,9 @@ export class CharacterListFacade implements OnDestroy {
   public isLoadingCharacter$: Observable<boolean> = this.isLoadingCharacterSubject.asObservable();
 
   private characterIdActionSubject = new Subject<string | number>();
+  private readonly currentCharacterSubject = new BehaviorSubject<Character | null>(null);
+  public readonly currentCharacter$: Observable<Character | null> = this.currentCharacterSubject.asObservable();
 
-  public readonly currentCharacter$: Observable<Character | null> = this.characterIdActionSubject.pipe(
-    tap(() => this.isLoadingCharacterSubject.next(true)),
-    switchMap(id => {
-      return this._characterService.getCharacterById(id).pipe(
-        tap(() => {
-          // La API respondió con éxito
-          this.isLoadingCharacterSubject.next(false);
-        }),
-        catchError(error => {
-          console.error('[Character by ID Stream Error]:', error);
-          this.isLoadingCharacterSubject.next(false);
-          return of(null); // Evita que el stream se rompa si la API falla
-        })
-      );
-    }),
-    // Mantiene el último personaje en memoria RAM para evitar repeticiones del HTML
-    shareReplay(1)
-  );
   //========CONTEO DE ESPECIES =========================================================================================
   public readonly allCharactersSubject: BehaviorSubject<Character[]> = new BehaviorSubject<Character[]>([]);
   public readonly allCharacters$: Observable<Character[]> = this.allCharactersSubject.asObservable().pipe(distinctUntilChanged());
@@ -108,6 +99,8 @@ export class CharacterListFacade implements OnDestroy {
   totalPages$: Observable<number> = this.totalPagesSubject.asObservable();
 
   private loadCharactersTrigger: Subject<LoadCharactersTrigger> = new Subject<LoadCharactersTrigger>();
+
+
 
   /**
    * Configura la escucha reactiva que se encarga de cancelar peticiones repetidas.
@@ -154,6 +147,49 @@ export class CharacterListFacade implements OnDestroy {
         );
       }),
       takeUntil(this.destroy$)// Corta la suscripción automáticamente al destruir el servicio
+    ).subscribe();
+  }
+
+  private name() {
+    this.characterIdActionSubject.pipe(
+      tap(() => this.isLoadingCharacterSubject.next(true)),
+      switchMap(id => {
+        return this._characterService.getCharacterById(id).pipe(
+          tap(() => {
+            // La API respondió con éxito
+            this.isLoadingCharacterSubject.next(false);
+          }),
+          catchError(error => {
+            console.error('[Character by ID Stream Error]:', error);
+            this.isLoadingCharacterSubject.next(false);
+            return of(null); // Evita que el stream se rompa si la API falla
+          })
+        );
+      }),
+      // Mantiene el último personaje en memoria RAM para evitar repeticiones del HTML
+      shareReplay(1)
+    );
+  }
+
+  private initLoadSingleCharacterTrigger(): void {
+    this.characterIdActionSubject.pipe(
+      distinctUntilChanged(), // Evita recargar si el usuario hace muchos clicks en el mismo personaje
+      tap(() => this.isLoadingCharacterSubject.next(true)),
+      switchMap((id: string | number) => {
+        return this._characterService.getCharacterById(id).pipe(
+          tap((response) => {
+            // La API respondió con éxito
+            this.currentCharacterSubject.next(response);
+          }),
+          catchError(error => {
+            console.error('[GraphQL/REST Audit 🚨] Fallo al cargar detalles individuales:', error);
+            this.currentCharacterSubject.next(null);
+            return of(null); // Retornamos null seguro para no romper el flujo interrumpiendo el canal
+          })
+        );
+      }),
+      tap(() => this.isLoadingCharacterSubject.next(false)),
+      takeUntil(this.destroy$)
     ).subscribe();
   }
 
