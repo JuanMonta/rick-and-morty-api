@@ -23,6 +23,10 @@ export class LoginComponent implements OnInit {
     private readonly router: Router,
     private readonly notificationService: NotificationService // Inyectamos las alertas flotantes
   ) {
+
+  }
+
+  ngOnInit(): void {
     // Inicializamos el formulario reactivo con reglas rígidas de validación síncrona
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]], // Obligatorio y con formato regex @
@@ -30,11 +34,12 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {
-  }
+  get emailControl() { return this.loginForm.get('email'); }
+  get passwordControl() { return this.loginForm.get('password'); }
 
   public onSubmit(): void {
     if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched(); // Fuerza a mostrar errores visuales si el usuario da click sin llenar nada
       this.notificationService.showWarning('Por favor, llena los campos obligatorios de forma correcta.');
       return;
     }
