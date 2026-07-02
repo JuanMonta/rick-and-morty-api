@@ -102,23 +102,23 @@ export class CharacterGraphqlService implements CharacterRepository {
 
 
 
-  getCharacterById(id: string | number): Observable<Character> {
+  getCharacterById(id: string | number): Observable<Character | null> {
 
     return this.apollo.query<CharacterGraphQLResponse>({
       query: GET_CHARACTER_BY_ID,
       variables: {
-        id: id
+        id: String(id)
       },
       errorPolicy: 'all', // Permite a Apollo procesar errores sin colapsar de inmediato
       fetchPolicy: 'cache-first' // Le decimos a Apollo: "Busca en tu memoria RAM primero. Si no está, ve a la red".
     }).pipe(
-      take(1),
       map(result => {
         const graphqlDto = result.data?.character;
-        if (graphqlDto) {
-          return characterGraphQlDtoToCharacter(graphqlDto);
-        }
-        return createBaseCharacter({});
+        return graphqlDto ? characterGraphQlDtoToCharacter(graphqlDto) : null;
+      }),
+      catchError(error => {
+        console.error('[GraphQL Audit 🚨] Fallo al cargar personaje por ID:', error);
+        return of(null);
       })
     );
   }
@@ -136,13 +136,15 @@ export class CharacterGraphqlService implements CharacterRepository {
         fetchPolicy: 'cache-first' // Le decimos a Apollo: "Busca en tu memoria RAM primero. Si no está, ve a la red".
       }
     ).pipe(
-      take(1),
       map(results => {
         const paginatedResults = results.data?.characters;
         if (!paginatedResults) {
           return { info: null, results: [] }
         }
-        return { info: paginatedResults.info, results: paginatedResults.results.map(char => characterGraphQlDtoToCharacter(char)) }
+        return {
+          info: paginatedResults.info,
+          results: paginatedResults.results.map(char => characterGraphQlDtoToCharacter(char))
+        }
       }),
       catchError(error => {
         console.error('[GraphQL Audit 🚨] Fallo en la consulta:', error);
