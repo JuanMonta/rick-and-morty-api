@@ -89,6 +89,11 @@ export class CharacterRestService implements CharacterRepository {
             };
           })
         );
+      }),
+      // Protege la llamada principal a 'apiCharacterUrl'. Si el personaje no existe devuelve null.
+      catchError(error => {
+        console.error(`[REST Audit 🚨] Fallo catastrófico al buscar el personaje maestro ID ${characterId}:`, error);
+        return of(null);
       })
     );
   }
