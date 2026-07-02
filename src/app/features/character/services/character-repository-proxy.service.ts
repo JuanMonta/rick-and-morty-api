@@ -25,7 +25,7 @@ export class CharacterRepositoryProxyService implements CharacterRepository {
     }
   }
 
-  getCharacterById(characterId: number | string): Observable<Character> {
+  getCharacterById(characterId: number | string): Observable<Character | null> {
     return this.apiMode.getCharacterById(characterId);
   }
 

@@ -27,7 +27,7 @@ export class CharacterRestService implements CharacterRepository {
 
   }
 
-  getCharacterById(characterId: number | string): Observable<Character> {
+  getCharacterById(characterId: number | string): Observable<Character | null> {
     return this._http.get<CharacterRestDTO>(`${this.apiCharacterUrl}/${characterId}`).pipe(
       map((dto: CharacterRestDTO) => {
         // Almacenamos el array original de URLs de episodios antes de limpiar
