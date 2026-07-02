@@ -5,21 +5,25 @@ import { PaginationComponent } from './components/pagination/pagination.componen
 import { TotalsCardComponent } from './components/totals/totals-card.component';
 import { MaterialModule } from './material.module';
 import { ChipComponent } from './components/chip/chip.component';
+import { CharacterFilterComponent } from './components/character-filter/character-filter.component';
+import { ReactiveFormsModule } from '@angular/forms';
 
 const COMPONENTS = [
-  TotalsCardComponent,
   AvatarComponent,
+  CharacterFilterComponent,
+  ChipComponent,
   PaginationComponent,
-  ChipComponent
+  TotalsCardComponent
 ]
 
 const IMPORTS = [
   MaterialModule, // Angular Material Components
+  ReactiveFormsModule
 ]
 
 @NgModule({
   declarations: [
-    COMPONENTS,
+    COMPONENTS
   ],
   imports: [
     CommonModule,

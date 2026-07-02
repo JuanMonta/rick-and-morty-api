@@ -1,12 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import { MaterialModule } from 'src/app/shared/material.module';
 import { SharedModule } from "src/app/shared/shared.module";
 import { CharacterRoutingModule } from './character-routing.module';
-import { CharacterDetailsComponent } from './containers/character-details/character-details.component';
 import { CharacterTableComponent } from './components/character-table/character-table.component';
+import { CharacterDetailsComponent } from './containers/character-details/character-details.component';
 import { CharacterPageComponent } from './containers/character-page/character-page.component';
-import { MaterialModule } from 'src/app/shared/material.module';
 
 
 @NgModule({
@@ -18,7 +17,6 @@ import { MaterialModule } from 'src/app/shared/material.module';
   ],
   imports: [
     CommonModule,
-    ReactiveFormsModule,
     SharedModule,
     MaterialModule,
     CharacterRoutingModule

@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
 import { Character } from 'src/app/core/models/api.model';
 
 @Component({
@@ -9,8 +8,6 @@ import { Character } from 'src/app/core/models/api.model';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CharacterTableComponent implements OnInit {
-
-  materialTableDataSource = new MatTableDataSource<Character>([]);
 
   @Input() characters: Character[] = [];
   @Input() isLoading: boolean = false;

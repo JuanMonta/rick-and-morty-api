@@ -6,12 +6,7 @@
 }
 
 /* Clases para ordenar un poco tus filtros y botones */
-.filtros-container {
-  padding-bottom: 15px;
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
+
 
 .paginacion-container {
   padding-top: 15px;
@@ -51,15 +46,6 @@
   height: 100%;
 }
 
-.filter-input {
-  /* Hace que los campos crezcan horizontalmente por igual */
-  flex: 1;
-}
-
-/* Ajuste fino para quitar el margen inferior extra de los form-fields de Angular Material */
-::ng-deep .filter-input .mat-form-field-wrapper {
-  margin-bottom: -1.25em;
-}
 
 /* --- RESPONSIVE DESIGN --- */
 @media (max-width: 768px) {
